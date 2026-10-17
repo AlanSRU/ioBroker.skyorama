@@ -93,6 +93,30 @@ of tonight's sky: when it is dark, which planets are up, the moon, satellite pas
 that are well placed (for example the Andromeda Galaxy, the Pleiades or the Orion Nebula; in the southern hemisphere
 also Omega Centauri and the Magellanic Clouds).
 
+### Visualisation: the sky dome
+
+An optional page that shows the sky above home as a dome (zenith in the middle, horizon at the edge, north at the
+top). Switch it on in the **Visualisation** tab; the [web adapter](https://github.com/ioBroker/ioBroker.web) then
+serves it at `/skyorama/dome.html`, for example `http://<ioBroker>:8082/skyorama/dome.html`. While it is off, the page
+says so.
+
+- The sky's colour follows the sun at your location: light blue by day, through sunset and twilight, to black at
+  night.
+- Stars, planets, constellation figures and deep-sky objects are drawn only when they could be seen: above the
+  horizon and brighter than what the sky allows right now (twilight, moonlight and the extra air near the horizon all
+  hide the fainter ones). The sun and moon are always shown when up.
+- Satellites you track are always shown (faint when they can't be seen); other satellites only when visible.
+  Aircraft are shown when an aircraft source is configured.
+- URL parameters: `?radius=30` (aircraft radius in nautical miles), `?figures=0` (no constellation figures),
+  `?labels=0` (no names), `?at=22:00` (another time, within a week), `?instance=1`.
+- The drawing code (`www/js/dome.js`) has no dependencies, so it can be embedded elsewhere, e.g. in an iframe on a
+  dashboard.
+
+Star positions: Yale Bright Star Catalogue (5th ed.), as converted by
+[brettonw/YaleBrightStarCatalog](https://github.com/brettonw/YaleBrightStarCatalog) (MIT, Bretton Wade); constellation
+figures: [d3-celestial](https://github.com/ofrohn/d3-celestial)
+by Olaf Frohn (BSD-3-Clause). Both notices are in `www/js/skydata.js`.
+
 ### Notifications
 
 Every alert is a state (`satellites.alert`, `aurora.alert`, `lightning.alert`, `aircraft.emergencyText`), so you can
@@ -174,7 +198,7 @@ sendTo('skyorama.0', 'aircraft', { radiusNm: 20 }, result => {
 
 ### Roadmap
 
-An optional overhead-dome and flight-map visualisation.
+A flight-map visualisation, and a VIS-2 widget for the dome.
 
 ## Changelog
 <!--
@@ -186,6 +210,7 @@ An optional overhead-dome and flight-map visualisation.
 * (Alan Paris) Satellites (ISS and Tiangong passes, pass alerts, orbit set) and astronomy (darkness, moon, planets, tonight's sky)
 * (Alan Paris) Aircraft: nearby aircraft, following one aircraft and aircraft details for front-ends, optional background states
 * (Alan Paris) Aurora (visible from home now?) and lightning nearby (Blitzortung)
+* (Alan Paris) Optional sky dome page (www): the sky above home as you would see it, with aircraft and satellites
 * (Alan Paris) Aircraft and lightning sources are configured by the user (URLs, optional API header, broker login); none built in
 * (Alan Paris) Choose up to 20 satellites for passes and alerts (ISS and Tiangong by default)
 * (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event

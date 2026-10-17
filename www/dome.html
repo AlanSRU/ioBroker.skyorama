@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Skyorama: the sky above home</title>
+        <style>
+            html,
+            body {
+                margin: 0;
+                height: 100%;
+                background: #05070d;
+                color: #dfe6f3;
+                font-family: system-ui, sans-serif;
+                overflow: hidden;
+            }
+            main {
+                position: fixed;
+                inset: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            #dome {
+                width: min(100vw, 100vh);
+                height: min(100vw, 100vh);
+                display: block;
+            }
+            #clock {
+                position: fixed;
+                top: 12px;
+                left: 16px;
+                font-size: 15px;
+                font-weight: 600;
+                opacity: 0.75;
+            }
+            #status {
+                position: fixed;
+                left: 50%;
+                bottom: 16px;
+                transform: translateX(-50%);
+                max-width: calc(100vw - 32px);
+                padding: 8px 14px;
+                border-radius: 8px;
+                background: rgba(20, 26, 40, 0.85);
+                font-size: 14px;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <main><canvas id="dome" aria-label="The sky above home"></canvas></main>
+        <div id="clock"></div>
+        <div id="status" role="status"></div>
+        <script src="../lib/js/socket.io.js"></script>
+        <script src="js/skydata.js"></script>
+        <script src="js/dome.js"></script>
+        <script src="js/app.js"></script>
+    </body>
+</html>

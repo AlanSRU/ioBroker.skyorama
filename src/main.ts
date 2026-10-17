@@ -11,6 +11,7 @@ import { AuroraModule } from './lib/aurora';
 import type { SourceHealth } from './lib/health';
 import type { Host } from './lib/host';
 import { LightningModule, topicPrefixOf } from './lib/lightning';
+import { SatrecCache, skyNow } from './lib/sky';
 import { EVENTS, Notifier, targetsFrom, type EventRule, type NotifyEvent } from './lib/notify';
 import {
     aircraftObjects,
@@ -41,6 +42,8 @@ class Skyorama extends utils.Adapter {
     private aurora: AuroraModule | undefined;
     private lightning: LightningModule | undefined;
     private notifier: Notifier | undefined;
+    private home: Location | undefined;
+    private readonly satrecs = new SatrecCache();
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -65,6 +68,7 @@ class Skyorama extends utils.Adapter {
             return;
         }
         this.log.info(`Location ${home.lat.toFixed(3)}, ${home.lon.toFixed(3)}`);
+        this.home = home;
 
         const sats = !!this.config.satellitesEnabled;
         const tracked = trackedIds(this.config.trackedSatellites);
@@ -402,6 +406,23 @@ class Skyorama extends utils.Adapter {
                 return n
                     ? { result: `Test notification sent to ${n} instance${n === 1 ? '' : 's'}` }
                     : { error: 'No usable notification target is saved' };
+            }
+            case 'sky': {
+                // the dome visualisation in www/ (off unless switched on in the settings)
+                if (!this.config.visualisationEnabled) {
+                    return { error: 'The visualisation is off (instance settings, Visualisation tab)' };
+                }
+                if (!this.home) {
+                    return { error: 'No location' };
+                }
+                // `at`: another moment to show (within a week), for previews; default now
+                const now = Date.now();
+                const at =
+                    num(m.at) !== null ? Math.min(now + 7 * 86400_000, Math.max(now - 7 * 86400_000, num(m.at)!)) : now;
+                const orbits = this.satellites?.orbits;
+                return skyNow(this.home, at, orbits ? this.satrecs.get(orbits.sats, orbits.at) : [], [
+                    ...(this.satellites?.trackedIds ?? []),
+                ]);
             }
             case 'satelliteOptions':
                 // the settings' choice of satellites (selectSendTo): what the current orbit set contains

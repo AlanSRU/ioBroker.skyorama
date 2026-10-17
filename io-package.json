@@ -124,7 +124,8 @@
         "notifyLightningQuietTo": 0,
         "notifyAircraftEmergencyCooldown": 30,
         "notifyAircraftEmergencyQuietFrom": 0,
-        "notifyAircraftEmergencyQuietTo": 0
+        "notifyAircraftEmergencyQuietTo": 0,
+        "visualisationEnabled": false
     },
     "objects": [],
     "instanceObjects": [

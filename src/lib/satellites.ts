@@ -283,6 +283,11 @@ export class SatellitesModule {
         return { at: this.tleAt, groups: this.tleGroups, sats: this.tle };
     }
 
+    /** Catalogue numbers of the satellites chosen in the settings. */
+    public get trackedIds(): readonly string[] {
+        return this.cfg.tracked;
+    }
+
     public get visiblePasses(): readonly Pass[] {
         return this.passes;
     }

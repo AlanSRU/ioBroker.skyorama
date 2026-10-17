@@ -719,6 +719,33 @@
                     "xl": 2
                 }
             }
+        },
+        "visualTab": {
+            "type": "panel",
+            "label": "Visualisation",
+            "items": {
+                "visualisationEnabled": {
+                    "type": "checkbox",
+                    "label": "Sky dome page",
+                    "help": "Served by the web adapter at /skyorama/dome.html, for example http://<ioBroker>:8082/skyorama/dome.html",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "visualParams": {
+                    "type": "staticText",
+                    "text": "Optional URL parameters: ?radius=30 (aircraft radius in nautical miles), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (another time, within a week), ?instance=1 (another Skyorama instance).",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
         }
     }
 }

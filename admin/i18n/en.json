@@ -76,5 +76,9 @@
     "Broker user name (optional)": "Broker user name (optional)",
     "Broker password (optional)": "Broker password (optional)",
     "Send a test notification": "Send a test notification",
-    "Uses the saved settings: save first": "Uses the saved settings: save first"
+    "Uses the saved settings: save first": "Uses the saved settings: save first",
+    "Visualisation": "Visualisation",
+    "Sky dome page": "Sky dome page",
+    "Served by the web adapter at /skyorama/dome.html, for example http://<ioBroker>:8082/skyorama/dome.html": "Served by the web adapter at /skyorama/dome.html, for example http://<ioBroker>:8082/skyorama/dome.html",
+    "Optional URL parameters: ?radius=30 (aircraft radius in nautical miles), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (another time, within a week), ?instance=1 (another Skyorama instance).": "Optional URL parameters: ?radius=30 (aircraft radius in nautical miles), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (another time, within a week), ?instance=1 (another Skyorama instance)."
 }
