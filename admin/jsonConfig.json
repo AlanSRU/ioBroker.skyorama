@@ -738,8 +738,8 @@
             "items": {
                 "visualisationEnabled": {
                     "type": "checkbox",
-                    "label": "Sky dome and flight map pages",
-                    "help": "Served by the web adapter at /skyorama/dome.html and /skyorama/map.html, for example http://<ioBroker>:8082/skyorama/map.html",
+                    "label": "Sky pages: dome, flight map and coming up",
+                    "help": "Served by the web adapter at /skyorama/ (dome.html, map.html and upcoming.html), for example http://<ioBroker>:8082/skyorama/",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
