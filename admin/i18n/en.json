@@ -84,5 +84,7 @@
     "Map tiles URL (optional)": "Map tiles URL (optional)",
     "Tile server for the flight map, with {z}, {x} and {y} (and {s} if it uses subdomains). Respect the tile provider's usage policy. Empty: no map, only range rings.": "Tile server for the flight map, with {z}, {x} and {y} (and {s} if it uses subdomains). Respect the tile provider's usage policy. Empty: no map, only range rings.",
     "Map attribution": "Map attribution",
-    "The credit the tile provider requires, shown on the map; https:// addresses become links": "The credit the tile provider requires, shown on the map; https:// addresses become links"
+    "The credit the tile provider requires, shown on the map; https:// addresses become links": "The credit the tile provider requires, shown on the map; https:// addresses become links",
+    "Dark map": "Dark map",
+    "Turns a light map style dark, to suit the page": "Turns a light map style dark, to suit the page"
 }

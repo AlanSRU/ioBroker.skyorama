@@ -31,6 +31,15 @@
                 min-height: 0;
                 background: #0d1220;
             }
+            /* "Dark map": a light tile style inverted to a dark one */
+            .sky-tiles-dark {
+                filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.85) saturate(0.35);
+            }
+            /* fractional zoom leaves hairline seams between tiles: let them overlap by half a pixel */
+            .leaflet-tile-container img.leaflet-tile {
+                width: 256.5px !important;
+                height: 256.5px !important;
+            }
             /* no tiles configured: a radar-style background */
             #map.radar {
                 background: radial-gradient(circle at center, #0f1a2e 0%, #070b14 75%);

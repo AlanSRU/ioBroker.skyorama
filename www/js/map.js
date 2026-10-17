@@ -306,7 +306,12 @@
         lightningOn = !!cfg.lightning;
         map = L.map('map', { zoomSnap: 0.25, attributionControl: true });
         if (cfg.tiles) {
-            L.tileLayer(cfg.tiles, { maxZoom: 17, attribution: attributionHtml(cfg.attribution) }).addTo(map);
+            L.tileLayer(cfg.tiles, {
+                maxZoom: 17,
+                attribution: attributionHtml(cfg.attribution),
+                // light map styles turned dark, to suit the page
+                className: cfg.dark ? 'sky-tiles-dark' : '',
+            }).addTo(map);
         } else {
             document.getElementById('map').classList.add('radar');
         }

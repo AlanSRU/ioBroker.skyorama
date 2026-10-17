@@ -440,6 +440,7 @@ class Skyorama extends utils.Adapter {
                     home: { lat: this.home.lat, lon: this.home.lon },
                     tiles: urlSettingOf(this.config.mapTilesUrl).url,
                     attribution: String(this.config.mapTilesAttribution ?? '').slice(0, 500),
+                    dark: this.config.mapTilesDark !== false,
                     aircraft: !!this.aircraft,
                     lightning: !!this.lightning,
                 };

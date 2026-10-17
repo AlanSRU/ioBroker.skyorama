@@ -127,7 +127,8 @@
         "notifyAircraftEmergencyQuietTo": 0,
         "visualisationEnabled": false,
         "mapTilesUrl": "",
-        "mapTilesAttribution": ""
+        "mapTilesAttribution": "",
+        "mapTilesDark": true
     },
     "objects": [],
     "instanceObjects": [

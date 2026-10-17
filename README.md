@@ -122,7 +122,8 @@ satellites show their next visible pass. `?units=km`, `mi` or `nm` sets the dist
 **The flight map** shows the aircraft around home with their recent tracks, a one-minute heading line, altitude
 colours, emergencies in red and lost contacts greyed, a choice of range, and (with the lightning module on) the strikes
 of the last hour. Map tiles are optional: enter a tile server URL with `{z}`, `{x}` and `{y}` and the attribution its
-provider requires (respect the provider's usage policy); without one the map shows range rings on a dark background.
+provider requires (respect the provider's usage policy); **Dark map** (on by default) turns a light map style dark to
+suit the page. Without a tile server the map shows range rings on a dark background.
 The map uses [Leaflet](https://leafletjs.com/) (BSD-2-Clause, included in `www/lib/leaflet`).
 
 Star positions: Yale Bright Star Catalogue (5th ed.), as converted by

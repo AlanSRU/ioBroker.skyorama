@@ -768,6 +768,18 @@
                     "md": 8,
                     "lg": 6,
                     "xl": 6
+                },
+                "mapTilesDark": {
+                    "type": "checkbox",
+                    "label": "Dark map",
+                    "help": "Turns a light map style dark, to suit the page",
+                    "disabled": "!data.visualisationEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
                 }
             }
         }
