@@ -193,6 +193,8 @@ describe('aircraft: backoff', () => {
         expect(backoffMs(3, new HttpError(429))).to.equal(240_000);
         expect(backoffMs(20, new HttpError(429))).to.equal(30 * 60_000);
         expect(backoffMs(1, new HttpError(429, 600_000))).to.equal(600_000);
+        expect(backoffMs(1, new HttpError(429, 3 * 3600_000))).to.equal(3 * 3600_000);
+        expect(backoffMs(1, new HttpError(429, 1e12))).to.equal(24 * 3600_000);
     });
 
     it('backs off other failures from 2 s up to 5 minutes', () => {

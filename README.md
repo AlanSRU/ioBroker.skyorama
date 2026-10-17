@@ -200,9 +200,10 @@ gentle request rates. Skyorama keeps its own rate low:
 - nothing is polled unless something needs it, either a front-end asking through `sendTo`, or the optional background
   polling for the `aircraft.*` states;
 - a front-end asking gets fresh data every 10 seconds at most, for the widest radius asked for in the last minute;
-- a source that fails is left alone before it is asked again: from 2 seconds, doubling up to 5 minutes, and after a
-  rate limit (HTTP 429) at least a minute, doubling up to 30 minutes (longer if the service asks for it with
-  Retry-After). This applies to the area source and to each lookup source.
+- the area source and the aircraft lookup (and its fallback) are left alone after a failure: from 2 seconds, doubling
+  up to 5 minutes, and after a rate limit (HTTP 429) at least a minute, doubling up to 30 minutes, or as long as the
+  service asks for with Retry-After (up to a day). Route lookups and photos are only asked when you open an aircraft's
+  details.
 
 Details for one aircraft are loaded only when asked for and cached (routes 1 day, photos 7 days):
 

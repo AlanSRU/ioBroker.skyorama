@@ -28,14 +28,15 @@ export function retryAfterOf(header: string | null, now = Date.now()): number | 
 }
 
 /**
- * How long to leave a source alone after its `failures`-th failure in a row. Rate limited (429): Retry-After, but at
- * least a minute, doubling up to 30 minutes. Anything else (timeouts, refused connections, errors): 2 s, doubling up
+ * How long to leave a source alone after its `failures`-th failure in a row. Rate limited (429): at least a minute,
+ * doubling up to 30 minutes, or longer when Retry-After asks for it (up to a day). Anything else (timeouts, refused connections, errors): 2 s, doubling up
  * to 5 minutes, so a source that has stopped answering is not asked over and over.
  */
 export function backoffMs(failures: number, err: unknown): number {
     const n = Math.max(1, failures);
     if (err instanceof HttpError && err.status === 429) {
-        return Math.min(30 * 60_000, Math.max(err.retryAfterMs ?? 0, 60_000 * 2 ** Math.min(n - 1, 10)));
+        const own = Math.min(30 * 60_000, 60_000 * 2 ** Math.min(n - 1, 10));
+        return Math.max(own, Math.min(24 * 3600_000, err.retryAfterMs ?? 0));
     }
     return Math.min(5 * 60_000, 2_000 * 2 ** Math.min(n - 1, 10));
 }
