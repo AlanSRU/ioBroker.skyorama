@@ -306,6 +306,9 @@ export class AstronomyModule {
 
     public async start(): Promise<void> {
         await this.tick();
+        if (this.host.stopped()) {
+            return;
+        }
         this.tickTimer = this.host.adapter.setInterval(() => void this.tick(), 60_000);
     }
 

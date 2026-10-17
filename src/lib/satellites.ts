@@ -342,6 +342,9 @@ export class SatellitesModule {
         }
         await this.host.updateConnection();
         await this.plan();
+        if (this.host.stopped()) {
+            return;
+        }
         this.planTimer = this.host.adapter.setInterval(() => void this.plan(), 3600_000);
         this.tickTimer = this.host.adapter.setInterval(() => void this.tick(), 60_000);
     }

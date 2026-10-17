@@ -168,7 +168,18 @@
             "native": {}
         }
     ],
-    "protectedNative": ["notifyTargets", "aircraftHeaderValue", "lightningUsername", "lightningPassword"],
+    "protectedNative": [
+        "notifyTargets",
+        "aircraftAreaUrl",
+        "aircraftLookupUrl",
+        "aircraftLookupUrl2",
+        "aircraftRouteUrl",
+        "aircraftHeaderValue",
+        "lightningBrokerUrl",
+        "lightningUsername",
+        "lightningPassword",
+        "mapTilesUrl"
+    ],
     "notifications": [
         {
             "scope": "skyorama",

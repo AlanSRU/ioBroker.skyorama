@@ -61,7 +61,7 @@ Requirements: Node.js 22.13 or newer, js-controller 6.0.11 or newer, Admin 7.6.2
 3. Satellites and astronomy are on straight away and need no further setup. The first orbit set is fetched from
    CelesTrak within a few minutes of the first start.
 4. Optionally:
-   - switch on aurora;
+   - check the **Aurora** tab (on by default; it fetches only around dusk and at night);
    - configure an aircraft source or a lightning feed (none is built in, see below);
    - add messaging instances on the **Notifications** tab;
    - switch on the web pages on the **Visualisation** tab.
@@ -86,12 +86,13 @@ settings on them are not lost.
 | | Request header name and value | empty | For services that need an API key; the value is stored encrypted |
 | | Background polling, radius, interval | off, 30 km, 60 s | Keeps the `aircraft.*` states up to date |
 | | Overhead from | 45° | An aircraft at least this high in the sky counts as overhead |
-| Aurora | Aurora | off | |
-| | aurora-nowcast instance | empty | For example `aurora-nowcast.0`, to add its Kp index to the text |
+| Aurora | Aurora | on | |
+| | aurora-nowcast instance | `aurora-nowcast.0` | Its Kp index is added to the text when that adapter is installed; nothing happens if it is not |
 | | Cloud cover limit | 60 % | With more cloud than this, the aurora counts as not visible |
 | | Use AuroraWatch UK | off | UK only |
 | Lightning | Lightning nearby | off | See [Lightning](#lightning) |
-| | Broker URL, topic prefix, user name, password | empty | Your own feed; the password is stored encrypted |
+| | Broker URL, user name, password | empty | Your own feed; the password is stored encrypted |
+| | Topic prefix | `blitzortung/1.1` | The usual prefix of Blitzortung-format feeds; change it if your feed uses another |
 | | Strike radius, near radius | 300 km, 40 km | |
 | Notifications | Messaging instances, events, recipients | none | See [Notifications](#notifications) |
 | Visualisation | Sky pages | off | See [The web pages](#the-web-pages) |

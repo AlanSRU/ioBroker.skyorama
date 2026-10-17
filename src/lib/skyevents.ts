@@ -512,11 +512,11 @@ export class SkyExtrasModule {
         } finally {
             if (!this.host.stopped()) {
                 // hourly, or sooner when the forecast is due
-                const wait = Math.max(
+                const nextInMs = Math.max(
                     30_000,
                     Math.min(3600_000, this.health ? this.nextForecast - Date.now() : 3600_000),
                 );
-                this.timer = this.host.adapter.setTimeout(() => void this.tick(), wait);
+                this.timer = this.host.adapter.setTimeout(() => void this.tick(), nextInMs);
             }
         }
     }
