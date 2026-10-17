@@ -3,6 +3,19 @@
         "name": "skyorama",
         "version": "0.0.1",
         "news": {
+            "0.1.0": {
+                "en": "First test release: satellite passes and alerts, astronomy with meteor showers, eclipses and moon and planet events, stargazing forecast, aurora visibility, aircraft and lightning from your own sources, notifications, and optional sky dome, flight map and coming-up pages",
+                "de": "Erste Testversion: Satellitenüberflüge und Hinweise, Astronomie mit Meteorströmen, Finsternissen sowie Mond- und Planetenereignissen, Sternbeobachtungs-Vorhersage, Polarlicht-Sichtbarkeit, Flugzeuge und Blitze aus eigenen Quellen, Benachrichtigungen sowie optionale Seiten für Himmelskuppel, Flugkarte und Vorschau",
+                "ru": "Первая тестовая версия: пролёты спутников и оповещения, астрономия с метеорными потоками, затмениями и событиями Луны и планет, прогноз для наблюдения звёзд, видимость полярного сияния, самолёты и молнии из собственных источников, уведомления, а также дополнительные страницы с куполом неба, картой полётов и ближайшими событиями",
+                "pt": "Primeira versão de teste: passagens de satélites e alertas, astronomia com chuvas de meteoros, eclipses e eventos da Lua e dos planetas, previsão para observar as estrelas, visibilidade da aurora, aeronaves e relâmpagos de fontes próprias, notificações e páginas opcionais de cúpula do céu, mapa de voos e próximos eventos",
+                "nl": "Eerste testversie: satellietpassages en meldingen, sterrenkunde met meteorenzwermen, verduisteringen en maan- en planeetgebeurtenissen, sterrenkijkverwachting, zichtbaarheid van het noorderlicht, vliegtuigen en bliksem uit eigen bronnen, meldingen en optionele pagina's met hemelkoepel, vluchtkaart en binnenkort",
+                "fr": "Première version de test : passages de satellites et alertes, astronomie avec essaims de météores, éclipses et événements de la Lune et des planètes, prévisions pour observer les étoiles, visibilité des aurores, avions et foudre depuis vos propres sources, notifications, et pages facultatives du dôme céleste, de la carte des vols et des événements à venir",
+                "it": "Prima versione di prova: passaggi di satelliti e avvisi, astronomia con sciami meteorici, eclissi ed eventi di Luna e pianeti, previsioni per osservare le stelle, visibilità dell'aurora, aerei e fulmini da fonti proprie, notifiche e pagine opzionali con cupola del cielo, mappa dei voli e prossimi eventi",
+                "es": "Primera versión de prueba: pasos de satélites y avisos, astronomía con lluvias de meteoros, eclipses y eventos de la Luna y los planetas, previsión para observar las estrellas, visibilidad de la aurora, aviones y rayos de fuentes propias, notificaciones y páginas opcionales de cúpula celeste, mapa de vuelos y próximos eventos",
+                "pl": "Pierwsza wersja testowa: przeloty satelitów i powiadomienia, astronomia z rojami meteorów, zaćmieniami oraz zjawiskami Księżyca i planet, prognoza do obserwacji nieba, widoczność zorzy, samoloty i wyładowania z własnych źródeł, powiadomienia oraz opcjonalne strony z kopułą nieba, mapą lotów i nadchodzącymi zdarzeniami",
+                "uk": "Перша тестова версія: прольоти супутників і сповіщення, астрономія з метеорними потоками, затемненнями та подіями Місяця й планет, прогноз для спостереження зірок, видимість полярного сяйва, літаки й блискавки з власних джерел, сповіщення, а також додаткові сторінки з куполом неба, картою польотів і найближчими подіями",
+                "zh-cn": "首个测试版本：卫星过境与提醒，包含流星雨、日月食及月球和行星事件的天文信息，观星预报，极光可见性，来自您自己数据源的飞机和闪电，通知，以及可选的天穹、航班地图和即将发生页面"
+            },
             "0.0.1": {
                 "en": "initial release",
                 "de": "Erstveröffentlichung",
