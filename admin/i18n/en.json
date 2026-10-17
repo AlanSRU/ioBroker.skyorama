@@ -16,5 +16,18 @@
     "No alert for flyovers that stay lower than this": "No alert for flyovers that stay lower than this",
     "Astronomy": "Astronomy",
     "Sun, moon, planets and tonight's sky": "Sun, moon, planets and tonight's sky",
-    "Calculated locally, no internet access": "Calculated locally, no internet access"
+    "Calculated locally, no internet access": "Calculated locally, no internet access",
+    "Aircraft": "Aircraft",
+    "Aircraft (ADS-B)": "Aircraft (ADS-B)",
+    "Polled only while a front-end asks for aircraft, or with background polling": "Polled only while a front-end asks for aircraft, or with background polling",
+    "Local receiver URL (optional)": "Local receiver URL (optional)",
+    "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.": "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.",
+    "Background polling": "Background polling",
+    "Keeps the aircraft states up to date for scripts and dashboards": "Keeps the aircraft states up to date for scripts and dashboards",
+    "Background radius (km)": "Background radius (km)",
+    "Aircraft within this distance count": "Aircraft within this distance count",
+    "Background interval (seconds)": "Background interval (seconds)",
+    "How often the aircraft states are updated": "How often the aircraft states are updated",
+    "Overhead from (degrees above the horizon)": "Overhead from (degrees above the horizon)",
+    "An aircraft at least this high in the sky counts as overhead": "An aircraft at least this high in the sky counts as overhead"
 }

@@ -3,9 +3,11 @@
     "target": "directory",
     "adapterName": "skyorama",
     "title": "Skyorama",
-    "description": "The sky over your location: visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
+    "description": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
     "keywords": [
         "sky",
+        "aircraft",
+        "ads-b",
         "satellites",
         "iss",
         "astronomy",

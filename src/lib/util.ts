@@ -39,6 +39,34 @@ export function toLocation(lat: unknown, lon: unknown, height?: unknown): Locati
     return { lat: la, lon: lo, height: Number.isFinite(h) ? h : 0 };
 }
 
+const EARTH_RADIUS_M = 6371e3;
+const RAD = Math.PI / 180;
+
+/** Great-circle distance in metres. */
+export function metres(aLat: number, aLon: number, bLat: number, bLon: number): number {
+    const h =
+        Math.sin(((bLat - aLat) * RAD) / 2) ** 2 +
+        Math.cos(aLat * RAD) * Math.cos(bLat * RAD) * Math.sin(((bLon - aLon) * RAD) / 2) ** 2;
+    return 2 * EARTH_RADIUS_M * Math.asin(Math.min(1, Math.sqrt(h)));
+}
+
+/** Initial bearing from a to b, degrees 0–360. */
+export function bearing(aLat: number, aLon: number, bLat: number, bLon: number): number {
+    const y = Math.sin((bLon - aLon) * RAD) * Math.cos(bLat * RAD);
+    const x =
+        Math.cos(aLat * RAD) * Math.sin(bLat * RAD) -
+        Math.sin(aLat * RAD) * Math.cos(bLat * RAD) * Math.cos((bLon - aLon) * RAD);
+    return (Math.atan2(y, x) / RAD + 360) % 360;
+}
+
+export const NM = 1852;
+export const FT = 0.3048;
+
+/** A finite number, or null. */
+export function num(v: unknown): number | null {
+    return typeof v === 'number' && Number.isFinite(v) ? v : null;
+}
+
 const POINTS = ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'];
 
 /**
@@ -65,4 +93,28 @@ export function clock(t: number, now: number): string {
 export function round(n: number, digits = 0): number {
     const f = 10 ** digits;
     return Math.round(n * f) / f;
+}
+
+/**
+ * The local receiver URL from the settings: an http(s) URL without a user name or password (fetch refuses those, and
+ * its error message would put the password in the log). `problem` says why a non-empty setting is not used.
+ */
+export function receiverUrlOf(setting: unknown): { url: string; problem?: string } {
+    const s = typeof setting === 'string' ? setting.trim() : '';
+    if (!s) {
+        return { url: '' };
+    }
+    let u: URL;
+    try {
+        u = new URL(s);
+    } catch {
+        return { url: '', problem: 'is not a valid URL' };
+    }
+    if (u.protocol !== 'http:' && u.protocol !== 'https:') {
+        return { url: '', problem: 'is not an http(s) URL' };
+    }
+    if (u.username || u.password) {
+        return { url: '', problem: 'must not contain a user name or password (not supported)' };
+    }
+    return { url: u.href };
 }

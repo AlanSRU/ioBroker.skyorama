@@ -27,17 +27,43 @@ const time = (id: string, name: string, role = 'date'): ObjectDef => state(id, {
 const degrees = (id: string, name: string, min: number, max: number): ObjectDef =>
     state(id, { name, type: 'number', role: 'value', unit: '°', min, max });
 
-export function infoObjects(satellites: boolean): ObjectDef[] {
-    return satellites
-        ? [
-              state('info.celestrak', {
-                  name: 'CelesTrak reachable',
-                  type: 'boolean',
-                  role: 'indicator.reachable',
-                  def: false,
-              }),
-          ]
-        : [];
+/** One `info.<id>` reachability state per data source in use. */
+export function infoObjects(sources: { id: string; name: string }[]): ObjectDef[] {
+    return sources.map(s =>
+        state(`info.${s.id}`, {
+            name: `${s.name} reachable`,
+            type: 'boolean',
+            role: 'indicator.reachable',
+            def: false,
+        }),
+    );
+}
+
+/** The background summary states (only written while background polling is on). */
+export function aircraftObjects(): ObjectDef[] {
+    const value = (id: string, name: string, unit: string, role = 'value'): ObjectDef =>
+        state(id, { name, type: 'number', role, unit });
+    return [
+        channel('aircraft', 'Aircraft'),
+        state('aircraft.count', { name: 'Aircraft within the radius', type: 'number', role: 'value' }),
+        flag('aircraft.overhead', 'Aircraft overhead'),
+        state('aircraft.emergency', {
+            name: 'Aircraft in an emergency',
+            type: 'boolean',
+            role: 'indicator.alarm',
+            def: false,
+        }),
+        text('aircraft.emergencyText', 'Emergency description'),
+        json('aircraft.list', 'Aircraft within the radius (JSON)', '[]'),
+        channel('aircraft.nearest', 'Nearest airborne aircraft'),
+        text('aircraft.nearest.callsign', 'Callsign'),
+        text('aircraft.nearest.type', 'Aircraft type'),
+        text('aircraft.nearest.registration', 'Registration'),
+        value('aircraft.nearest.altitude', 'Altitude', 'ft'),
+        value('aircraft.nearest.distance', 'Distance', 'km', 'value.distance'),
+        degrees('aircraft.nearest.bearing', 'Bearing from home', 0, 360),
+        degrees('aircraft.nearest.elevation', 'Elevation above the horizon', 0, 90),
+    ];
 }
 
 export function satelliteObjects(): ObjectDef[] {

@@ -16,5 +16,18 @@
     "Sun, moon, planets and tonight's sky": "Sol, luna, planetas y el cielo de esta noche.",
     "The alert is written this long before the space station comes into view": "La alerta se escribe con esta antelación antes de que la estación espacial sea visible",
     "Track satellites": "Seguimiento de satélites",
-    "Use the latitude and longitude from the system settings": "Utilice la latitud y longitud desde la configuración del sistema"
+    "Use the latitude and longitude from the system settings": "Utilice la latitud y longitud desde la configuración del sistema",
+    "Aircraft": "Aviones",
+    "Aircraft (ADS-B)": "Aviones (ADS-B)",
+    "Polled only while a front-end asks for aircraft, or with background polling": "Solo se consulta mientras una interfaz pide aviones, o con la consulta en segundo plano",
+    "Local receiver URL (optional)": "URL del receptor propio (opcional)",
+    "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.": "aircraft.json de su propio receptor dump1090, readsb o tar1090, p. ej. http://192.168.1.20/tar1090/data/aircraft.json. Se usa en lugar de adsb.lol para los aviones de su zona.",
+    "Background polling": "Consulta en segundo plano",
+    "Keeps the aircraft states up to date for scripts and dashboards": "Mantiene actualizados los estados de aviones para scripts y paneles",
+    "Background radius (km)": "Radio en segundo plano (km)",
+    "Aircraft within this distance count": "Cuentan los aviones dentro de esta distancia",
+    "Background interval (seconds)": "Intervalo en segundo plano (segundos)",
+    "How often the aircraft states are updated": "Cada cuánto se actualizan los estados de aviones",
+    "Overhead from (degrees above the horizon)": "Sobre la cabeza desde (grados sobre el horizonte)",
+    "An aircraft at least this high in the sky counts as overhead": "Un avión al menos a esta altura en el cielo cuenta como sobre la cabeza"
 }

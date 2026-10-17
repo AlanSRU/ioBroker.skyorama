@@ -119,6 +119,87 @@
                     "xl": 12
                 }
             }
+        },
+        "aircraftTab": {
+            "type": "panel",
+            "label": "Aircraft",
+            "items": {
+                "aircraftEnabled": {
+                    "type": "checkbox",
+                    "label": "Aircraft (ADS-B)",
+                    "help": "Polled only while a front-end asks for aircraft, or with background polling",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "receiverUrl": {
+                    "type": "text",
+                    "label": "Local receiver URL (optional)",
+                    "help": "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.",
+                    "disabled": "!data.aircraftEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "backgroundEnabled": {
+                    "type": "checkbox",
+                    "label": "Background polling",
+                    "help": "Keeps the aircraft states up to date for scripts and dashboards",
+                    "disabled": "!data.aircraftEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "backgroundRadiusKm": {
+                    "type": "number",
+                    "label": "Background radius (km)",
+                    "help": "Aircraft within this distance count",
+                    "min": 1,
+                    "max": 463,
+                    "disabled": "!data.aircraftEnabled || !data.backgroundEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3,
+                    "newLine": true
+                },
+                "backgroundIntervalS": {
+                    "type": "number",
+                    "label": "Background interval (seconds)",
+                    "help": "How often the aircraft states are updated",
+                    "min": 30,
+                    "max": 600,
+                    "disabled": "!data.aircraftEnabled || !data.backgroundEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "overheadElevation": {
+                    "type": "number",
+                    "label": "Overhead from (degrees above the horizon)",
+                    "help": "An aircraft at least this high in the sky counts as overhead",
+                    "min": 10,
+                    "max": 90,
+                    "disabled": "!data.aircraftEnabled || !data.backgroundEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
         }
     }
 }

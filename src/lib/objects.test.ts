@@ -1,12 +1,18 @@
 import { expect } from 'chai';
 import { instanceObjects } from '../../io-package.json';
-import { astronomyObjects, infoObjects, satelliteObjects, type ObjectDef } from './objects';
+import { aircraftObjects, astronomyObjects, infoObjects, satelliteObjects, type ObjectDef } from './objects';
 
 const all: ObjectDef[] = [
     ...instanceObjects.map(o => ({ id: o._id, obj: o as unknown as ioBroker.SettableObject })),
-    ...infoObjects(true),
+    ...infoObjects([
+        { id: 'celestrak', name: 'CelesTrak' },
+        { id: 'adsblol', name: 'adsb.lol' },
+        { id: 'adsbfi', name: 'adsb.fi' },
+        { id: 'receiver', name: 'Local receiver' },
+    ]),
     ...satelliteObjects(),
     ...astronomyObjects(),
+    ...aircraftObjects(),
 ];
 
 /** Roles used, with what the role list (repochecker config_StateRoles.js) requires of them. */
@@ -14,6 +20,8 @@ const ROLES: Record<string, { types: string[]; write?: boolean }> = {
     'indicator.connected': { types: ['boolean'], write: false },
     'indicator.reachable': { types: ['boolean'], write: false },
     indicator: { types: ['boolean'], write: false },
+    'indicator.alarm': { types: ['boolean'], write: false },
+    'value.distance': { types: ['number'], write: false },
     json: { types: ['string'] },
     text: { types: ['string'] },
     value: { types: ['number'], write: false },
@@ -68,7 +76,7 @@ describe('objects', () => {
 
     it('puts a unit on every angle', () => {
         for (const { id, obj } of all) {
-            if (/(elevation|azimuth|maxEl|Az)$/.test(id)) {
+            if (/(elevation|azimuth|bearing|maxEl|Az)$/.test(id)) {
                 expect((obj.common as ioBroker.StateCommon).unit, id).to.equal('°');
             }
         }

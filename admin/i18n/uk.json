@@ -16,5 +16,18 @@
     "Sun, moon, planets and tonight's sky": "Сонце, місяць, планети та сьогоднішнє небо",
     "The alert is written this long before the space station comes into view": "Попередження записується за цей час до появи космічної станції",
     "Track satellites": "Відстеження супутників",
-    "Use the latitude and longitude from the system settings": "Використовуйте широту та довготу в налаштуваннях системи"
+    "Use the latitude and longitude from the system settings": "Використовуйте широту та довготу в налаштуваннях системи",
+    "Aircraft": "Літаки",
+    "Aircraft (ADS-B)": "Літаки (ADS-B)",
+    "Polled only while a front-end asks for aircraft, or with background polling": "Опитується, лише поки інтерфейс запитує літаки, або з фоновим опитуванням",
+    "Local receiver URL (optional)": "URL власного приймача (необов'язково)",
+    "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.": "aircraft.json вашого приймача dump1090, readsb або tar1090, наприклад http://192.168.1.20/tar1090/data/aircraft.json. Використовується замість adsb.lol для літаків навколо вас.",
+    "Background polling": "Фонове опитування",
+    "Keeps the aircraft states up to date for scripts and dashboards": "Підтримує стани літаків актуальними для скриптів і панелей",
+    "Background radius (km)": "Радіус фонового опитування (км)",
+    "Aircraft within this distance count": "Враховуються літаки в межах цієї відстані",
+    "Background interval (seconds)": "Інтервал фонового опитування (секунди)",
+    "How often the aircraft states are updated": "Як часто оновлюються стани літаків",
+    "Overhead from (degrees above the horizon)": "Над головою від (градусів над горизонтом)",
+    "An aircraft at least this high in the sky counts as overhead": "Літак щонайменше на цій висоті в небі вважається таким, що над головою"
 }

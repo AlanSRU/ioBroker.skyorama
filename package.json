@@ -1,7 +1,7 @@
 {
     "name": "iobroker.skyorama",
     "version": "0.0.1",
-    "description": "The sky over your location: visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
+    "description": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
     "author": {
         "name": "Alan Paris",
         "email": "alan.paris@scottish.rugby"
@@ -12,6 +12,8 @@
     "keywords": [
         "ioBroker",
         "sky",
+        "aircraft",
+        "ads-b",
         "satellites",
         "iss",
         "astronomy",
@@ -23,12 +25,12 @@
         "url": "https://github.com/AlanSRU/ioBroker.skyorama.git"
     },
     "engines": {
-        "node": ">= 22"
+        "node": ">= 22.13"
     },
     "dependencies": {
         "@iobroker/adapter-core": "^3.4.3",
         "astronomy-engine": "^2.1.19",
-        "satellite.js": "^6.0.2"
+        "satellite.js": "^7.1.0"
     },
     "devDependencies": {
         "@alcalzone/release-script": "^5.2.1",

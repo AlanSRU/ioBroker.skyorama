@@ -37,7 +37,6 @@ const STEP_MS = 20_000;
 /** Visible: lit by the sun, at least this high, and the sky at the observer dark (sun below SUN_EL). */
 const VIS_EL = 10;
 const SUN_EL = -6;
-const EARTH_RADIUS_KM = 6378;
 
 export const ORBIT_REFRESH_MS = 12 * 3600_000;
 /** CelesTrak blocks IPs that fetch the same data more often than every 2 h. */
@@ -98,18 +97,11 @@ export function groupList(setting: unknown): string[] {
 }
 
 /**
- * Outside the earth's shadow (a cylinder behind the earth, away from the sun). `sun` only gives the direction.
+ * Lit by the sun: less than half the sun's disc hidden by the earth (the edge of the earth's shadow cylinder).
+ * `sun` is the sun's position in AU (`sunPos().rsun`), `r` the satellite's in km, both ECI.
  */
-export function sunlit(r: { x: number; y: number; z: number }, sun: number[]): boolean {
-    const n = Math.hypot(sun[0], sun[1], sun[2]);
-    const sx = sun[0] / n;
-    const sy = sun[1] / n;
-    const sz = sun[2] / n;
-    const along = r.x * sx + r.y * sy + r.z * sz;
-    if (along > 0) {
-        return true;
-    }
-    return Math.hypot(r.x - along * sx, r.y - along * sy, r.z - along * sz) > EARTH_RADIUS_KM;
+export function sunlit(r: sat.EciVec3<number>, sun: sat.EciVec3<number>): boolean {
+    return sat.shadowFraction(sun, r) < 0.5;
 }
 
 /**
@@ -117,9 +109,9 @@ export function sunlit(r: { x: number; y: number; z: number }, sun: number[]): b
  */
 export function lookAt(rec: sat.SatRec, home: Location, t: number): { az: number; el: number; lit: boolean } | null {
     const date = new Date(t);
-    // propagate() returns null on errors although its type says otherwise
-    const pv = sat.propagate(rec, date);
-    if (!pv || typeof pv.position !== 'object') {
+    // null for bad elements; the decay check also catches long-decayed objects that SGP4 still "propagates"
+    const pv = sat.propagate(rec, date, { communityDecayCheckEnabled: true });
+    if (!pv) {
         return null;
     }
     const jd = sat.jday(date);
@@ -236,7 +228,7 @@ export class SatellitesModule {
         /** called after the passes were re-planned */
         private readonly onPasses: () => void,
     ) {
-        this.health = new SourceHealth('CelesTrak', host.log);
+        this.health = new SourceHealth('CelesTrak', host.log, 'celestrak');
         this.health.unproven();
     }
 

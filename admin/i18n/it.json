@@ -16,5 +16,18 @@
     "Sun, moon, planets and tonight's sky": "Sole, luna, pianeti e il cielo di stasera",
     "The alert is written this long before the space station comes into view": "L'avviso viene scritto con questo anticipo prima che la stazione spaziale diventi visibile",
     "Track satellites": "Traccia i satelliti",
-    "Use the latitude and longitude from the system settings": "Utilizza la latitudine e la longitudine dalle impostazioni di sistema"
+    "Use the latitude and longitude from the system settings": "Utilizza la latitudine e la longitudine dalle impostazioni di sistema",
+    "Aircraft": "Aerei",
+    "Aircraft (ADS-B)": "Aerei (ADS-B)",
+    "Polled only while a front-end asks for aircraft, or with background polling": "Interrogato solo mentre un'interfaccia richiede aerei, o con l'interrogazione in background",
+    "Local receiver URL (optional)": "URL del ricevitore locale (facoltativo)",
+    "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.": "aircraft.json del tuo ricevitore dump1090, readsb o tar1090, ad es. http://192.168.1.20/tar1090/data/aircraft.json. Usato al posto di adsb.lol per gli aerei intorno a te.",
+    "Background polling": "Interrogazione in background",
+    "Keeps the aircraft states up to date for scripts and dashboards": "Mantiene aggiornati gli stati degli aerei per script e dashboard",
+    "Background radius (km)": "Raggio in background (km)",
+    "Aircraft within this distance count": "Contano gli aerei entro questa distanza",
+    "Background interval (seconds)": "Intervallo in background (secondi)",
+    "How often the aircraft states are updated": "Ogni quanto vengono aggiornati gli stati degli aerei",
+    "Overhead from (degrees above the horizon)": "Sopra di te da (gradi sopra l'orizzonte)",
+    "An aircraft at least this high in the sky counts as overhead": "Un aereo almeno così alto nel cielo conta come sopra di te"
 }

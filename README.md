@@ -12,15 +12,29 @@
 
 ## Skyorama adapter for ioBroker
 
-What is in the sky over your location, as ioBroker states for automations, dashboards and alerts: the visible passes
-of the space stations, the moon and planets, how dark it is and what is worth looking at tonight.
+What is in the sky over your location, as ioBroker states for automations, dashboards and alerts: aircraft nearby, the
+visible passes of the space stations, the moon and planets, how dark it is and what is worth looking at tonight.
+Front-ends (dashboards, maps) can also ask the adapter directly for aircraft, a followed aircraft's position and
+aircraft details.
 
 Skyorama works anywhere: it uses the latitude and longitude from the ioBroker system settings (or a location entered
-in the instance settings). Requires Node.js 22 or newer.
+in the instance settings). Requires Node.js 22.13 or newer.
 
 ### Modules
 
 Each module can be switched on or off in the instance settings. Switching a module off keeps its objects.
+
+#### Aircraft
+
+- Positions come from the free community ADS-B feeds [adsb.lol](https://adsb.lol/) (aircraft around you) and
+  [adsb.fi](https://adsb.fi/) (one aircraft wherever it is, at most one request a second), or from your own receiver
+  ([readsb](https://github.com/wiedehopf/readsb), dump1090 or [tar1090](https://github.com/wiedehopf/tar1090)
+  `aircraft.json`) if you enter its URL.
+- Nothing is polled unless something needs it: a front-end asking through `sendTo` (every 10 seconds while asked, for
+  the widest radius asked for in the last minute), or the optional background polling for the `aircraft.*` states.
+- Details for one aircraft (route, photo, airline) come from the [VRS standing data](https://github.com/vradarserver/standing-data)
+  and [planespotters.net](https://www.planespotters.net/) (photos are returned with the photographer's name and a link,
+  as their terms ask). They are loaded only when asked for and cached (routes 1 day, photos 7 days).
 
 #### Satellites
 
@@ -46,6 +60,12 @@ also Omega Centauri and the Magellanic Clouds).
 |---|---|
 | `info.connection` | All data sources in use are reachable (false until the first successful fetch, and after two failed attempts in a row) |
 | `info.celestrak` | CelesTrak reachable |
+| `info.adsblol` / `info.adsbfi` / `info.receiver` | The aircraft feeds reachable (written once a feed has been used) |
+| `aircraft.count` | Aircraft within the background radius (background polling only, like all `aircraft.*` states) |
+| `aircraft.overhead` | An airborne aircraft is at least the set angle above the horizon (default 45°) |
+| `aircraft.nearest.*` | Nearest airborne aircraft: `callsign`, `type`, `registration`, `altitude` (ft), `distance` (km), `bearing` (°), `elevation` (°) |
+| `aircraft.emergency` / `aircraft.emergencyText` | An aircraft is reporting an emergency (or squawking 7500, 7600 or 7700), and a description |
+| `aircraft.list` | The aircraft within the background radius (JSON, same fields as the `aircraft` message) |
 | `satellites.alert` | Alert text, written shortly before a visible space station pass |
 | `satellites.tle` | The orbit set (JSON `{ at, groups, sats: [[name, line1, line2], …] }`) |
 | `satellites.<iss\|tiangong>.visibleNow` | The station is visible right now |
@@ -66,17 +86,21 @@ Front-ends can ask the adapter directly. Every message gets an answer; errors co
 | Command | Message | Answer |
 |---|---|---|
 | `tle` | none | `{ at, groups, sats: [[name, line1, line2], …] }`, the orbit set for drawing satellites |
+| `aircraft` | `{ radiusNm }` (1–250, default 40) | `{ at, radiusNm, ac: [...] }`, nearest first: `hex`, `flight`, `reg`, `type`, `lat`, `lon`, `alt` (ft, 0 = on the ground), `gs` (kn), `track`, `dst` (nm), `dir` (bearing from home), `vr` (ft/min), `selAlt`, `squawk`, `emergency`, `stale`, `trail` (`[[lat, lon, alt], …]`, the last 15 minutes) |
+| `follow` | `{ hex }` | `{ at, found, ac }`: where the aircraft is now, wherever it is: `lat`, `lon`, `altGeom` (GNSS height, ft), `altBaro`, `gs`, `track`, `heading`, `roll`, `vr`, `seenPos`, `flight`, `reg`, `type`, `squawk`, `emergency`. Keep asking (every few seconds) while you follow it |
+| `lookup` | `{ hex, flight, reg, lat, lon }` | `{ airline, route, photo }`: `route` = `{ from, to, fromName, toName, plausible, fromPos, toPos }` or null, `photo` = `{ src, link, by }` or null |
 
 ```js
-sendTo('skyorama.0', 'tle', {}, result => {
-    log(`${result.sats.length} orbits from ${new Date(result.at)}`);
+sendTo('skyorama.0', 'aircraft', { radiusNm: 20 }, result => {
+    if (result.error) return log(result.error, 'warn');
+    for (const a of result.ac) log(`${a.flight || a.hex} at ${a.alt} ft, ${a.dst} nm`);
 });
 ```
 
 ### Roadmap
 
-Aircraft overhead (ADS-B), the chance of seeing the aurora, nearby lightning, notifications to messaging adapters,
-and an optional overhead-dome and flight-map visualisation.
+The chance of seeing the aurora, nearby lightning, notifications to messaging adapters, and an optional overhead-dome
+and flight-map visualisation.
 
 ## Changelog
 <!--
@@ -86,6 +110,7 @@ and an optional overhead-dome and flight-map visualisation.
 
 ### **WORK IN PROGRESS**
 * (Alan Paris) Satellites (ISS and Tiangong passes, pass alerts, orbit set) and astronomy (darkness, moon, planets, tonight's sky)
+* (Alan Paris) Aircraft: nearby aircraft, following one aircraft and aircraft details for front-ends, optional background states
 
 ## License
 MIT License

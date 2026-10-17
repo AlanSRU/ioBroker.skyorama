@@ -70,13 +70,17 @@ describe('satellites: orbit data', () => {
 });
 
 describe('satellites: geometry', () => {
-    const sun = [1, 0, 0];
+    const sun = { x: 1, y: 0, z: 0 }; // 1 AU along x
     it('is lit on the sun side and beside the shadow cylinder', () => {
         expect(sunlit({ x: 7000, y: 0, z: 0 }, sun)).to.equal(true);
         expect(sunlit({ x: -7000, y: 7000, z: 0 }, sun)).to.equal(true);
     });
     it('is dark inside the earth shadow', () => {
         expect(sunlit({ x: -7000, y: 100, z: 0 }, sun)).to.equal(false);
+    });
+    it('puts the boundary at the edge of the earth (half the sun hidden)', () => {
+        expect(sunlit({ x: -7000, y: 6420, z: 0 }, sun)).to.equal(true);
+        expect(sunlit({ x: -7000, y: 6340, z: 0 }, sun)).to.equal(false);
     });
 });
 

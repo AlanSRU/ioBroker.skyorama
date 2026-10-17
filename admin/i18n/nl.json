@@ -16,5 +16,18 @@
     "Sun, moon, planets and tonight's sky": "Zon, maan, planeten en de hemel van vanavond",
     "The alert is written this long before the space station comes into view": "De waarschuwing wordt zo lang geschreven voordat het ruimtestation zichtbaar wordt",
     "Track satellites": "Volg satellieten",
-    "Use the latitude and longitude from the system settings": "Gebruik de breedte- en lengtegraad uit de systeeminstellingen"
+    "Use the latitude and longitude from the system settings": "Gebruik de breedte- en lengtegraad uit de systeeminstellingen",
+    "Aircraft": "Vliegtuigen",
+    "Aircraft (ADS-B)": "Vliegtuigen (ADS-B)",
+    "Polled only while a front-end asks for aircraft, or with background polling": "Alleen opgevraagd zolang een weergave om vliegtuigen vraagt, of met opvragen op de achtergrond",
+    "Local receiver URL (optional)": "URL van eigen ontvanger (optioneel)",
+    "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.": "aircraft.json van uw eigen dump1090-, readsb- of tar1090-ontvanger, bijv. http://192.168.1.20/tar1090/data/aircraft.json. Wordt gebruikt in plaats van adsb.lol voor vliegtuigen om u heen.",
+    "Background polling": "Opvragen op de achtergrond",
+    "Keeps the aircraft states up to date for scripts and dashboards": "Houdt de vliegtuiggegevens actueel voor scripts en dashboards",
+    "Background radius (km)": "Straal op de achtergrond (km)",
+    "Aircraft within this distance count": "Vliegtuigen binnen deze afstand tellen mee",
+    "Background interval (seconds)": "Interval op de achtergrond (seconden)",
+    "How often the aircraft states are updated": "Hoe vaak de vliegtuiggegevens worden bijgewerkt",
+    "Overhead from (degrees above the horizon)": "Recht boven u vanaf (graden boven de horizon)",
+    "An aircraft at least this high in the sky counts as overhead": "Een vliegtuig minstens zo hoog aan de hemel geldt als recht boven u"
 }

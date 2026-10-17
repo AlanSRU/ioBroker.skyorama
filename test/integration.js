@@ -39,6 +39,8 @@ tests.integration(path.join(__dirname, '..'), {
                         longitude: -3.19,
                         satellitesEnabled: false,
                         astronomyEnabled: true,
+                        aircraftEnabled: true,
+                        backgroundEnabled: false,
                     },
                 });
                 await harness.startAdapterAndWait(true);
@@ -63,6 +65,11 @@ tests.integration(path.join(__dirname, '..'), {
                 this.timeout(10000);
                 expect(await sendTo('tle', {})).to.deep.equal({ error: 'Satellites module is off' });
                 expect(await sendTo('nonsense', {})).to.have.property('error');
+                // aircraft: invalid input is answered without touching the network
+                expect(await sendTo('follow', { hex: 'not-a-hex' })).to.deep.equal({
+                    error: 'hex must be a 6-digit ICAO address',
+                });
+                expect(await sendTo('lookup', JSON.stringify({ hex: '' }))).to.have.property('error');
             });
         });
     },
