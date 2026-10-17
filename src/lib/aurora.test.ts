@@ -1,5 +1,6 @@
 import { expect } from 'chai';
-import { auroraWatchLevel, cloudCover, decide, ovationAround, type AuroraInputs } from './aurora';
+import { AuroraModule, auroraWatchLevel, cloudCover, decide, ovationAround, type AuroraInputs } from './aurora';
+import type { Host } from './host';
 import type { Location } from './util';
 
 const EDINBURGH: Location = { lat: 55.95, lon: -3.19, height: 0 };
@@ -157,5 +158,52 @@ describe('aurora: decision', () => {
         );
         const south = { lat: -46, here: 1, near: 15, nearLat: -48, peak: 40, peakLat: -60, forecastAt: null };
         expect(decide({ ...base, ovation: south, north: false }).summary).to.contain('Look south.');
+    });
+});
+
+describe('aurora: restart at night', () => {
+    it('keeps the restored states until every source has answered once', async () => {
+        // home on the equator at local solar midnight, whenever this runs: deep night all year
+        const now = new Date();
+        const utcHours = now.getUTCHours() + now.getUTCMinutes() / 60;
+        const lon = ((((-utcHours * 15) % 360) + 540) % 360) - 180; // local solar time = UTC + lon / 15 = 0
+        const writes: string[] = [];
+        const quiet = (): void => undefined;
+        const host = {
+            adapter: {
+                getStateAsync: (id: string) => Promise.resolve(id === 'aurora.possible' ? { val: true, ts: 0 } : null),
+                getForeignStateAsync: () => Promise.resolve(null),
+                setTimeout: () => undefined,
+                clearTimeout: quiet,
+            },
+            log: { warn: quiet, info: quiet, debug: quiet, error: quiet },
+            home: { lat: 0, lon, height: 0 },
+            stopped: () => false,
+            write: (id: string) => {
+                writes.push(id);
+                return Promise.resolve();
+            },
+            updateConnection: () => Promise.resolve(),
+            notify: () => Promise.resolve(),
+        } as unknown as Host;
+        const mod = new AuroraModule(
+            host,
+            { cloudLimit: 60, auroraWatch: false, nowcastInstance: '' },
+            {
+                getJson: () => Promise.resolve({ coordinates: [], current: { cloud_cover: 5 } }),
+                getText: () => Promise.resolve(''),
+            },
+        );
+        await mod.start(); // first tick: nothing fetched yet (the first fetch waits a random few seconds)
+        expect(writes).to.deep.equal([]);
+        const m = mod as unknown as {
+            ovation: { nextAt: number };
+            cloud: { nextAt: number };
+            tick: () => Promise<void>;
+        };
+        m.ovation.nextAt = 0;
+        m.cloud.nextAt = 0;
+        await m.tick(); // both sources tried: now it judges
+        expect(writes).to.include('aurora.possible');
     });
 });

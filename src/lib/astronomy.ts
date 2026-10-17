@@ -280,7 +280,7 @@ export function tonightText(n: Tonight, now: number): string {
     }
     if (n.passes.length) {
         parts.push(
-            `Space stations: ${n.passes.map(p => `${p.sat} ${clock(p.start, now).slice(-5)} (${p.maxEl}°)`).join(', ')}.`,
+            `Satellite passes: ${n.passes.map(p => `${p.sat} ${clock(p.start, now).slice(-5)} (${p.maxEl}°)`).join(', ')}.`,
         );
     }
     if (n.deepSky.length) {

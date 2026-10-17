@@ -286,6 +286,7 @@ export class AircraftModule {
     private followRunning = false;
     private fiQueue: Promise<void> = Promise.resolve();
     private lastFiAt = 0;
+    private emergencyHexes = new Set<string>();
 
     public constructor(
         private readonly host: Host,
@@ -303,7 +304,26 @@ export class AircraftModule {
         return this.cfg.receiverUrl ? [this.area, this.adsbfi, this.adsblol] : [this.adsblol, this.adsbfi];
     }
 
-    public start(): void {
+    public async start(): Promise<void> {
+        // emergencies already reported before a restart are not reported again
+        if (this.cfg.background.enabled) {
+            try {
+                const list = JSON.parse(
+                    String((await this.host.adapter.getStateAsync('aircraft.list'))?.val ?? '[]'),
+                ) as {
+                    hex?: unknown;
+                    emergency?: unknown;
+                }[];
+                this.emergencyHexes = new Set(
+                    (Array.isArray(list) ? list : []).filter(a => a?.emergency).map(a => String(a.hex)),
+                );
+            } catch {
+                // no usable list
+            }
+        }
+        if (this.host.stopped()) {
+            return;
+        }
         if (this.cfg.background.enabled) {
             // spread the load: a jittered first poll after startup
             this.scheduleArea(5_000 + Math.floor(Math.random() * 25_000));
@@ -459,6 +479,16 @@ export class AircraftModule {
 
     private async writeStates(list: Aircraft[]): Promise<void> {
         const s = summarise(list, this.host.home, this.cfg.overheadEl);
+        // a notification for each aircraft that newly reports an emergency
+        const emergencies = list.filter(a => a.emergency);
+        const fresh = emergencies.filter(a => !this.emergencyHexes.has(a.hex));
+        this.emergencyHexes = new Set(emergencies.map(a => a.hex));
+        if (fresh.length) {
+            await this.host.notify(
+                'aircraftEmergency',
+                summarise(fresh, this.host.home, this.cfg.overheadEl).emergencyText,
+            );
+        }
         const w = this.host.write;
         await w('aircraft.count', s.count);
         await w('aircraft.overhead', s.overhead);

@@ -1,8 +1,14 @@
 import { expect } from 'chai';
 import * as sat from 'satellite.js';
 import { sunAltitude } from './astronomy';
+import type { Host } from './host';
 import {
+    SatellitesModule,
     catalogueNumber,
+    keyOf,
+    nameOf,
+    satelliteOptions,
+    trackedIds,
     dueAlerts,
     groupList,
     lookAt,
@@ -150,5 +156,97 @@ describe('satellites: alerts', () => {
         expect(passText(p, now)).to.match(
             /^ISS visible from \d\d:\d\d for 4 min: from the W, highest 54° in the S at \d\d:\d\d, towards the E$/,
         );
+    });
+});
+
+describe('satellites: choosing satellites', () => {
+    it('defaults to the stations, keeps valid unique ids and caps the list', () => {
+        expect(trackedIds(undefined)).to.deep.equal({ ids: ['25544', '48274'], capped: false });
+        expect(trackedIds(['20580', ' 20580', 'x', 25544])).to.deep.equal({ ids: ['20580', '25544'], capped: false });
+        const many = Array.from({ length: 25 }, (_, i) => String(10000 + i));
+        expect(trackedIds(many)).to.deep.include({ capped: true });
+        expect(trackedIds(many).ids).to.have.length(20);
+    });
+
+    it("keeps the stations' object ids and names, others by catalogue number", () => {
+        expect(keyOf('25544')).to.equal('iss');
+        expect(keyOf('20580')).to.equal('n20580');
+        expect(nameOf('48274')).to.equal('Tiangong');
+        expect(nameOf('20580', ['HST         ', '1 20580U', '2 20580'])).to.equal('HST');
+        expect(nameOf('20580')).to.equal('Satellite 20580');
+    });
+
+    it('offers the stations first, then the orbit set by name, keeping selected ones that are missing', () => {
+        const tle: Tle[] = [
+            ['ZARYA', '1 99999U', '2 99999'],
+            ['HST', '1 20580U', '2 20580'],
+            ['ISS (ZARYA)', '1 25544U', '2 25544'],
+        ];
+        expect(satelliteOptions(tle, ['12345']).map(o => o.label)).to.deep.equal([
+            'ISS (25544)',
+            'Tiangong (48274, not in the orbit set)',
+            'HST (20580)',
+            'ZARYA (99999)',
+            'Satellite 12345 (12345, not in the orbit set)',
+        ]);
+    });
+});
+
+describe('satellites: alerts across a restart', () => {
+    const soon = Date.now() + 6 * 60_000;
+
+    /** Starts the module with the passes JSON a previous run left, then runs one minute tick. */
+    async function run(saved: Record<string, unknown> | null): Promise<string[]> {
+        const notes: string[] = [];
+        const quiet = (): void => undefined;
+        const host = {
+            adapter: {
+                getStateAsync: (id: string) =>
+                    Promise.resolve(
+                        id === 'satellites.iss.passes' && saved ? { val: JSON.stringify(saved), ts: 0 } : null,
+                    ),
+                setTimeout: () => undefined,
+                clearTimeout: quiet,
+                setInterval: () => undefined,
+                clearInterval: quiet,
+                delay: () => Promise.resolve(),
+                extendObject: () => Promise.resolve(),
+            },
+            log: { warn: quiet, info: quiet, debug: quiet, error: quiet },
+            home: EDINBURGH,
+            stopped: () => false,
+            write: () => Promise.resolve(),
+            updateConnection: () => Promise.resolve(),
+            notify: (_e: string, m: string) => {
+                notes.push(m);
+                return Promise.resolve();
+            },
+        } as unknown as Host;
+        const mod = new SatellitesModule(
+            host,
+            { groups: ['stations'], leadMin: 10, minEl: 20, tracked: ['25544', '48274'] },
+            quiet,
+        );
+        await mod.start(); // no saved orbits: no passes yet
+        const m = mod as unknown as { passes: Pass[]; tick: () => Promise<void> };
+        m.passes = [pass({ start: soon, end: soon + 4 * 60_000, maxAt: soon + 2 * 60_000 })];
+        await m.tick();
+        return notes;
+    }
+
+    it('alerts a pass coming into view', async () => {
+        expect(await run(null)).to.have.length(1);
+    });
+
+    it('does not alert a pass again after a restart, whatever the lead time', async () => {
+        // re-planning after the restart moved the pass by one step
+        const saved = { at: 0, passes: [{ ...pass({ start: soon + 20_000 }), alerted: true }] };
+        expect(await run(saved)).to.deep.equal([]);
+    });
+
+    it('still alerts another pass of the same satellite, or of another one', async () => {
+        expect(await run({ passes: [{ ...pass({ start: soon - 92 * 60_000 }), alerted: true }] })).to.have.length(1);
+        expect(await run({ passes: [{ ...pass({ sat: 'Tiangong', start: soon }), alerted: true }] })).to.have.length(1);
+        expect(await run({ passes: [pass({ start: soon })] })).to.have.length(1); // planned, not alerted
     });
 });

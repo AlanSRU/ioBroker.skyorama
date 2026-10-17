@@ -1,7 +1,6 @@
 // Every object the adapter creates, per module. Kept in one place so a unit test can check the tree.
 
 import { DARKNESS_LABELS, PLANETS } from './astronomy';
-import { STATIONS } from './satellites';
 
 export interface ObjectDef {
     id: string;
@@ -66,19 +65,20 @@ export function aircraftObjects(): ObjectDef[] {
     ];
 }
 
-export function satelliteObjects(): ObjectDef[] {
+/** `tracked`: object id under `satellites.` and display name of each tracked satellite. */
+export function satelliteObjects(tracked: { key: string; name: string }[]): ObjectDef[] {
     const out: ObjectDef[] = [
         channel('satellites', 'Satellites'),
         json('satellites.tle', 'Orbit set from CelesTrak (JSON)', '{"sats":[]}'),
-        text('satellites.alert', 'Space station pass alert'),
+        text('satellites.alert', 'Satellite pass alert'),
     ];
-    for (const [key, st] of Object.entries(STATIONS)) {
+    for (const { key, name } of tracked) {
         const id = `satellites.${key}`;
         out.push(
-            channel(id, st.name),
-            flag(`${id}.visibleNow`, `${st.name} visible now`),
-            json(`${id}.passes`, `${st.name} visible passes, next 72 h (JSON)`, '{"passes":[]}'),
-            channel(`${id}.next`, `${st.name} next visible pass`),
+            channel(id, name),
+            flag(`${id}.visibleNow`, `${name} visible now`),
+            json(`${id}.passes`, `${name} visible passes, next 72 h (JSON)`, '{"passes":[]}'),
+            channel(`${id}.next`, `${name} next visible pass`),
             time(`${id}.next.start`, 'Comes into view', 'date.start'),
             time(`${id}.next.end`, 'Goes out of view', 'date.end'),
             degrees(`${id}.next.maxEl`, 'Highest elevation', 0, 90),

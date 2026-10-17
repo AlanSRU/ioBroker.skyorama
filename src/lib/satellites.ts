@@ -1,4 +1,4 @@
-// Satellites: CelesTrak orbits (twice a day at most), visible passes of the space stations over home, pass alerts.
+// Satellites: CelesTrak orbits (twice a day at most), visible passes of the chosen satellites over home, pass alerts.
 
 import * as sat from 'satellite.js';
 import { type Host } from './host';
@@ -26,11 +26,53 @@ export interface Pass {
     toAz: number;
 }
 
-/** The stations whose passes are worked out; key = object id under `satellites.` */
+/** The space stations: short names and object ids of their own; tracked by default. */
 export const STATIONS: Record<string, { id: string; name: string }> = {
     iss: { id: '25544', name: 'ISS' },
     tiangong: { id: '48274', name: 'Tiangong' },
 };
+
+/** At most this many satellites are tracked (72 h of passes each is real CPU work on a small host). */
+export const MAX_TRACKED = 20;
+
+/** A tracked satellite: catalogue number, object id under `satellites.`, display name. */
+export interface Tracked {
+    id: string;
+    key: string;
+    name: string;
+}
+
+/** The setting (catalogue numbers) → valid, unique ids, at most MAX_TRACKED; ISS and Tiangong if not set. */
+export function trackedIds(setting: unknown): { ids: string[]; capped: boolean } {
+    if (!Array.isArray(setting)) {
+        return { ids: Object.values(STATIONS).map(s => s.id), capped: false };
+    }
+    const ids = [...new Set(setting.map(v => String(v).trim()).filter(v => /^\d{1,9}$/.test(v)))];
+    return { ids: ids.slice(0, MAX_TRACKED), capped: ids.length > MAX_TRACKED };
+}
+
+/** Object id: the stations keep `iss` / `tiangong`, others `n<catalogue number>`. */
+export function keyOf(id: string): string {
+    return Object.entries(STATIONS).find(([, s]) => s.id === id)?.[0] ?? `n${id}`;
+}
+
+/** Display name: the stations' short names, otherwise the orbit set's name. */
+export function nameOf(id: string, tle?: Tle): string {
+    return Object.values(STATIONS).find(s => s.id === id)?.name ?? (tle ? tle[0].trim() : `Satellite ${id}`);
+}
+
+/** Options for the settings: stations first, then by name; selected satellites missing from the set stay listed. */
+export function satelliteOptions(tle: Tle[], selected: string[]): { value: string; label: string }[] {
+    const byId = new Map(tle.map(t => [catalogueNumber(t[1]), t]));
+    const stationIds = Object.values(STATIONS).map(s => s.id);
+    const others = [...byId.keys()].filter(id => !stationIds.includes(id));
+    others.sort((a, b) => nameOf(a, byId.get(a)).localeCompare(nameOf(b, byId.get(b))));
+    const ids = [...stationIds, ...others, ...selected.filter(id => !byId.has(id) && !stationIds.includes(id))];
+    return ids.map(id => ({
+        value: id,
+        label: byId.has(id) ? `${nameOf(id, byId.get(id))} (${id})` : `${nameOf(id)} (${id}, not in the orbit set)`,
+    }));
+}
 
 const PASS_HOURS = 72;
 const STEP_MS = 20_000;
@@ -208,6 +250,8 @@ export interface SatellitesConfig {
     groups: string[];
     leadMin: number;
     minEl: number;
+    /** catalogue numbers of the satellites to track */
+    tracked: string[];
 }
 
 /** Runs the module: orbit refresh, pass planning (hourly), the per-minute visible/next/alert update. */
@@ -217,7 +261,9 @@ export class SatellitesModule {
     private tleAt = 0;
     private tleGroups: string[] = [];
     private passes: Pass[] = [];
+    /** passes alerted already; kept in each satellite's passes JSON so a restart doesn't alert them again */
     private alerted: Alerted[] = [];
+    private readonly names = new Map<string, string>();
     private fetchTimer: ioBroker.Timeout | undefined;
     private planTimer: ioBroker.Interval | undefined;
     private tickTimer: ioBroker.Interval | undefined;
@@ -244,6 +290,19 @@ export class SatellitesModule {
     public async start(): Promise<void> {
         // The last good set survives restarts, so a restart never costs CelesTrak a fetch.
         let savedGroups: string[] = [];
+        for (const id of this.cfg.tracked) {
+            const st = await this.host.adapter.getStateAsync(`satellites.${keyOf(id)}.passes`);
+            try {
+                const j = JSON.parse(String(st?.val || '{}')) as { passes?: (Pass & { alerted?: boolean })[] };
+                for (const p of j.passes ?? []) {
+                    if (p.alerted && typeof p.sat === 'string' && typeof p.start === 'number') {
+                        this.alerted.push({ sat: p.sat, start: p.start });
+                    }
+                }
+            } catch {
+                // nothing to restore
+            }
+        }
         const saved = await this.host.adapter.getStateAsync('satellites.tle');
         try {
             const j = JSON.parse(String(saved?.val || '{}')) as { at?: number; sats?: Tle[]; groups?: string[] };
@@ -340,32 +399,71 @@ export class SatellitesModule {
         await this.plan();
     }
 
-    /** Work out the visible passes of the stations for the next 72 h. */
+    /** The tracked satellites, with names from the orbit set (made unique: passes are told apart by name). */
+    private get tracked(): Tracked[] {
+        const list = this.cfg.tracked.map(id => ({
+            id,
+            key: keyOf(id),
+            name: nameOf(
+                id,
+                this.tle.find(t => catalogueNumber(t[1]) === id),
+            ),
+        }));
+        return list.map(t =>
+            list.filter(x => x.name === t.name).length > 1 ? { ...t, name: `${t.name} (${t.id})` } : t,
+        );
+    }
+
+    private isAlerted(p: Pass): boolean {
+        return this.alerted.some(a => a.sat === p.sat && Math.abs(a.start - p.start) < 5 * 60_000);
+    }
+
+    /** One satellite's passes as JSON, alerted ones marked (that is what survives a restart). */
+    private async writePasses(t: Tracked, at: number): Promise<void> {
+        const passes = this.passes
+            .filter(p => p.sat === t.name)
+            .map(p => (this.isAlerted(p) ? { ...p, alerted: true } : p));
+        await this.host.write(`satellites.${t.key}.passes`, JSON.stringify({ at, passes }));
+    }
+
+    /** Work out the visible passes of the tracked satellites for the next 72 h. */
     private async plan(): Promise<void> {
         const home = this.host.home;
         const from = Date.now();
         const all: Pass[] = [];
-        for (const [key, st] of Object.entries(STATIONS)) {
-            const tle = this.tle.find(t => catalogueNumber(t[1]) === st.id);
-            let passes: Pass[] = [];
+        for (const t of this.tracked) {
+            const tle = this.tle.find(x => catalogueNumber(x[1]) === t.id);
+            if (!tle && this.tle.length) {
+                this.host.log.debug(
+                    `Satellite ${t.id} is not in the orbit set (CelesTrak groups ${this.tleGroups.join(', ')})`,
+                );
+            }
             if (tle) {
                 try {
-                    passes = predictPasses(st.name, sat.twoline2satrec(tle[1], tle[2]), home, from, PASS_HOURS, t =>
-                        sunAltitude(home, t),
-                    ).map(roundPass);
+                    all.push(
+                        ...predictPasses(t.name, sat.twoline2satrec(tle[1], tle[2]), home, from, PASS_HOURS, x =>
+                            sunAltitude(home, x),
+                        ).map(roundPass),
+                    );
                 } catch (err) {
-                    this.host.log.warn(`${st.name}: pass prediction failed: ${String(err)}`);
+                    this.host.log.warn(`${t.name}: pass prediction failed: ${String(err)}`);
                 }
             }
-            all.push(...passes);
-            await this.host.write(`satellites.${key}.passes`, JSON.stringify({ at: from, passes }));
-            // CPU-bound work: let other adapters in the same (compact) process run between stations.
+            // the channel shows the satellite's name once the orbit set knows it
+            if (this.names.get(t.key) !== t.name) {
+                this.names.set(t.key, t.name);
+                await this.host.adapter.extendObject(`satellites.${t.key}`, { common: { name: t.name } });
+            }
+            // CPU-bound work: let other adapters in the same (compact) process run between satellites.
             await this.host.adapter.delay(0);
             if (this.host.stopped()) {
                 return;
             }
         }
         this.passes = all.sort((a, b) => a.start - b.start);
+        for (const t of this.tracked) {
+            await this.writePasses(t, from);
+        }
         await this.tick();
         this.onPasses();
     }
@@ -373,8 +471,8 @@ export class SatellitesModule {
     /** Once a minute: visible now, next pass, alerts. */
     private async tick(): Promise<void> {
         const now = Date.now();
-        for (const [key, st] of Object.entries(STATIONS)) {
-            const mine = this.passes.filter(p => p.sat === st.name);
+        for (const { key, name } of this.tracked) {
+            const mine = this.passes.filter(p => p.sat === name);
             const next = mine.find(p => p.end >= now);
             await this.host.write(
                 `satellites.${key}.visibleNow`,
@@ -390,7 +488,13 @@ export class SatellitesModule {
         }
         for (const p of dueAlerts(this.passes, now, this.cfg.leadMin, this.cfg.minEl, this.alerted)) {
             this.alerted.push({ sat: p.sat, start: p.start });
-            await this.host.write('satellites.alert', passText(p, now), true);
+            const t = this.tracked.find(x => x.name === p.sat);
+            if (t) {
+                await this.writePasses(t, now);
+            }
+            const text = passText(p, now);
+            await this.host.write('satellites.alert', text, true);
+            await this.host.notify('satellitePass', text);
         }
         this.alerted = this.alerted.filter(a => a.start > now - 3600_000);
     }

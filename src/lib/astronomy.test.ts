@@ -100,7 +100,7 @@ describe('astronomy: tonight', () => {
         expect(n.deepSky.map(x => x.name)).to.not.include('Large Magellanic Cloud');
         expect(n.passes).to.have.length(1);
         expect(n.text).to.match(/^Dark from \d\d:\d\d to /);
-        expect(n.text).to.contain('Space stations: ISS');
+        expect(n.text).to.contain('Satellite passes: ISS');
     });
 
     it('says so when there is no darkness', () => {

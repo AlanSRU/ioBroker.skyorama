@@ -22,7 +22,11 @@ const all: ObjectDef[] = [
         { id: 'aurorawatch', name: 'AuroraWatch UK' },
         { id: 'blitzortung', name: 'Blitzortung' },
     ]),
-    ...satelliteObjects(),
+    ...satelliteObjects([
+        { key: 'iss', name: 'ISS' },
+        { key: 'tiangong', name: 'Tiangong' },
+        { key: 'n20580', name: 'HST' },
+    ]),
     ...astronomyObjects(),
     ...aircraftObjects(),
     ...auroraObjects(),

@@ -54,7 +54,7 @@
                 "satellitesEnabled": {
                     "type": "checkbox",
                     "label": "Track satellites",
-                    "help": "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong",
+                    "help": "Orbits from CelesTrak, at most twice a day; visible passes of the satellites you choose",
                     "newLine": true,
                     "xs": 12,
                     "sm": 12,
@@ -74,10 +74,25 @@
                     "lg": 6,
                     "xl": 6
                 },
+                "trackedSatellites": {
+                    "type": "selectSendTo",
+                    "command": "satelliteOptions",
+                    "multiple": true,
+                    "noTranslation": true,
+                    "label": "Satellites to track (passes and alerts)",
+                    "help": "Up to 20, chosen from the current orbit set (the adapter must be running to list them). ISS and Tiangong by default.",
+                    "disabled": "!data.satellitesEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
                 "passAlertLeadMin": {
                     "type": "number",
                     "label": "Alert this many minutes before a visible flyover",
-                    "help": "The alert is written this long before the space station comes into view",
+                    "help": "The alert is written this long before the satellite comes into view",
                     "min": 1,
                     "max": 120,
                     "disabled": "!data.satellitesEnabled",
@@ -296,6 +311,296 @@
                     "md": 4,
                     "lg": 3,
                     "xl": 3
+                }
+            }
+        },
+        "notifyTab": {
+            "type": "panel",
+            "label": "Notifications",
+            "items": {
+                "notifyIntro": {
+                    "type": "staticText",
+                    "text": "Every alert is also a state, so you can build your own rules instead. Recipient: required for Discord (user ID, user name or serverID/channelID); optional e-mail address for email, user for Telegram, topic for ntfy.",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifyTargets": {
+                    "type": "table",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12,
+                    "items": [
+                        {
+                            "type": "checkbox",
+                            "attr": "enabled",
+                            "title": "Active",
+                            "width": "8%",
+                            "default": true
+                        },
+                        {
+                            "type": "instance",
+                            "attr": "instance",
+                            "title": "Messaging instance",
+                            "width": "20%",
+                            "adapter": "",
+                            "adapters": [
+                                "pushover",
+                                "telegram",
+                                "email",
+                                "signal-cmb",
+                                "whatsapp-cmb",
+                                "matrix-org",
+                                "gotify",
+                                "ntfy-client",
+                                "pushsafer",
+                                "pushbullet",
+                                "discord",
+                                "synochat"
+                            ]
+                        },
+                        {
+                            "type": "text",
+                            "attr": "recipient",
+                            "title": "Recipient (optional)",
+                            "width": "24%",
+                            "default": ""
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "satellitePass",
+                            "title": "Satellite pass",
+                            "width": "12%",
+                            "default": true
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "aurora",
+                            "title": "Aurora",
+                            "width": "12%",
+                            "default": true
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "lightning",
+                            "title": "Lightning",
+                            "width": "12%",
+                            "default": true
+                        },
+                        {
+                            "type": "checkbox",
+                            "attr": "aircraftEmergency",
+                            "title": "Aircraft emergency",
+                            "width": "12%",
+                            "default": true
+                        }
+                    ]
+                },
+                "notifyAdmin": {
+                    "type": "checkbox",
+                    "label": "Also show in the ioBroker notifications (Admin and notification-manager)",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifyRulesText": {
+                    "type": "staticText",
+                    "text": "Per event: at most one message in the cooldown time, and none in the quiet hours (ioBroker host time, from the first hour until the second; the same hour twice means no quiet time).",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifySatellitePassHeader": {
+                    "type": "header",
+                    "text": "Satellite pass",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifySatellitePassCooldown": {
+                    "type": "number",
+                    "label": "Cooldown (minutes)",
+                    "min": 0,
+                    "max": 1440,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifySatellitePassQuietFrom": {
+                    "type": "number",
+                    "label": "Quiet from (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifySatellitePassQuietTo": {
+                    "type": "number",
+                    "label": "Quiet until (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyAuroraHeader": {
+                    "type": "header",
+                    "text": "Aurora",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifyAuroraCooldown": {
+                    "type": "number",
+                    "label": "Cooldown (minutes)",
+                    "min": 0,
+                    "max": 1440,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyAuroraQuietFrom": {
+                    "type": "number",
+                    "label": "Quiet from (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyAuroraQuietTo": {
+                    "type": "number",
+                    "label": "Quiet until (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyLightningHeader": {
+                    "type": "header",
+                    "text": "Lightning",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifyLightningCooldown": {
+                    "type": "number",
+                    "label": "Cooldown (minutes)",
+                    "min": 0,
+                    "max": 1440,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyLightningQuietFrom": {
+                    "type": "number",
+                    "label": "Quiet from (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyLightningQuietTo": {
+                    "type": "number",
+                    "label": "Quiet until (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyAircraftEmergencyHeader": {
+                    "type": "header",
+                    "text": "Aircraft emergency",
+                    "size": 5,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "notifyAircraftEmergencyCooldown": {
+                    "type": "number",
+                    "label": "Cooldown (minutes)",
+                    "min": 0,
+                    "max": 1440,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyAircraftEmergencyQuietFrom": {
+                    "type": "number",
+                    "label": "Quiet from (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
+                },
+                "notifyAircraftEmergencyQuietTo": {
+                    "type": "number",
+                    "label": "Quiet until (hour)",
+                    "min": 0,
+                    "max": 23,
+                    "xs": 12,
+                    "sm": 4,
+                    "md": 3,
+                    "lg": 2,
+                    "xl": 2
                 }
             }
         }

@@ -13,7 +13,7 @@
 ## Skyorama adapter for ioBroker
 
 What is in the sky over your location, as ioBroker states for automations, dashboards and alerts: aircraft nearby, the
-visible passes of the space stations, the moon and planets, how dark it is, what is worth looking at tonight, whether
+visible passes of the ISS and other satellites, the moon and planets, how dark it is, what is worth looking at tonight, whether
 the aurora can be seen from home right now, and lightning nearby.
 Front-ends (dashboards, maps) can also ask the adapter directly for aircraft, a followed aircraft's position and
 aircraft details.
@@ -66,8 +66,10 @@ An alert text is written for the first strike within the near radius (default 40
 - Orbits come from [CelesTrak](https://celestrak.org/), fetched at most twice a day at a random time (CelesTrak blocks
   addresses that fetch the same data more often than every 2 hours). The last orbit set is kept, so a restart does not
   cause a new fetch. A change to the CelesTrak groups in the settings takes effect at most 2 hours after the last fetch.
-- Visible passes of the **ISS** and **Tiangong** over your location are worked out for the next 72 hours. A pass counts as
-  visible when the station is lit by the sun, at least 10° above the horizon, and the sun at your location is more
+- Visible passes over your location are worked out for the next 72 hours for the satellites you choose in the settings:
+  up to 20 from the orbit set (with the default `visual` group, the ISS, Tiangong and about 150 of the brightest
+  satellites; the ISS and Tiangong are chosen by default). A pass counts as
+  visible when the satellite is lit by the sun, at least 10° above the horizon, and the sun at your location is more
   than 6° below the horizon.
 - An alert text is written a set time before each visible pass that gets high enough (defaults: 10 minutes, 20°).
 
@@ -75,9 +77,25 @@ An alert text is written for the first strike within the near radius (default 40
 
 Calculated locally with [Astronomy Engine](https://github.com/cosinekitty/astronomy), no internet access: the
 darkness (day, civil / nautical / astronomical twilight, night), the moon, the five naked-eye planets, and a summary
-of tonight's sky: when it is dark, which planets are up, the moon, space station passes, and bright deep-sky objects
+of tonight's sky: when it is dark, which planets are up, the moon, satellite passes, and bright deep-sky objects
 that are well placed (for example the Andromeda Galaxy, the Pleiades or the Orion Nebula; in the southern hemisphere
 also Omega Centauri and the Magellanic Clouds).
+
+### Notifications
+
+Every alert is a state (`satellites.alert`, `aurora.alert`, `lightning.alert`, `aircraft.emergencyText`), so you can
+build your own rules. Skyorama can also send them itself, set up on the **Notifications** tab:
+
+- a table of messaging instances, each with the events it should receive (satellite pass, aurora, lightning,
+  aircraft emergency) and an optional recipient;
+- per event, a cooldown (at most one message in that time) and quiet hours (no messages, in the ioBroker host's time);
+- optionally, the ioBroker notification system as well (shown in Admin, and passed on by
+  [notification-manager](https://github.com/foxriver76/ioBroker.notification-manager) to the messenger set up there).
+
+Supported: pushover, telegram, email, signal-cmb, whatsapp-cmb, matrix-org, gotify, ntfy-client, pushsafer,
+pushbullet, discord and synochat; each gets the message in the form it expects. Discord needs a recipient (a user ID,
+a user name or `serverID/channelID`); for email the recipient is the address (otherwise the adapter's default), for
+Telegram a user, for ntfy a topic. Aircraft emergencies are sent only with background aircraft polling on.
 
 ### States
 
@@ -91,11 +109,11 @@ also Omega Centauri and the Magellanic Clouds).
 | `aircraft.nearest.*` | Nearest airborne aircraft: `callsign`, `type`, `registration`, `altitude` (ft), `distance` (km), `bearing` (°), `elevation` (°) |
 | `aircraft.emergency` / `aircraft.emergencyText` | An aircraft is reporting an emergency (or squawking 7500, 7600 or 7700), and a description |
 | `aircraft.list` | The aircraft within the background radius (JSON, same fields as the `aircraft` message) |
-| `satellites.alert` | Alert text, written shortly before a visible space station pass |
+| `satellites.alert` | Alert text, written shortly before a visible pass of a chosen satellite |
 | `satellites.tle` | The orbit set (JSON `{ at, groups, sats: [[name, line1, line2], …] }`) |
-| `satellites.<iss\|tiangong>.visibleNow` | The station is visible right now |
-| `satellites.<iss\|tiangong>.passes` | Visible passes in the next 72 hours (JSON) |
-| `satellites.<iss\|tiangong>.next.*` | The next visible pass: `start`, `end`, `maxEl`, `maxAt`, `fromAz`, `toAz`, `text` |
+| `satellites.<satellite>.visibleNow` | The satellite is visible right now (`<satellite>` is `iss`, `tiangong`, or `n` and the catalogue number, e.g. `n20580` for the Hubble Space Telescope) |
+| `satellites.<satellite>.passes` | Visible passes in the next 72 hours (JSON; passes already alerted are marked `alerted`) |
+| `satellites.<satellite>.next.*` | The next visible pass: `start`, `end`, `maxEl`, `maxAt`, `fromAz`, `toAz`, `text` |
 | `astronomy.darkness` | `day`, `civil`, `nautical`, `astronomical` or `night` |
 | `astronomy.moon.*` | `phase`, `illumination` (%), `elevation` (°), next `rise` and `set` |
 | `astronomy.planets.<name>.*` | `visible`, `elevation`, `azimuth`, next `rise` and `set`, `magnitude` |
@@ -143,7 +161,7 @@ sendTo('skyorama.0', 'aircraft', { radiusNm: 20 }, result => {
 
 ### Roadmap
 
-Notifications to messaging adapters, and an optional overhead-dome and flight-map visualisation.
+An optional overhead-dome and flight-map visualisation.
 
 ## Changelog
 <!--
@@ -155,6 +173,8 @@ Notifications to messaging adapters, and an optional overhead-dome and flight-ma
 * (Alan Paris) Satellites (ISS and Tiangong passes, pass alerts, orbit set) and astronomy (darkness, moon, planets, tonight's sky)
 * (Alan Paris) Aircraft: nearby aircraft, following one aircraft and aircraft details for front-ends, optional background states
 * (Alan Paris) Aurora (visible from home now?) and lightning nearby (Blitzortung)
+* (Alan Paris) Choose up to 20 satellites for passes and alerts (ISS and Tiangong by default)
+* (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event
 
 ## License
 MIT License

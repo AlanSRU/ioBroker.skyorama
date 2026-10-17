@@ -11,6 +11,7 @@ import { AuroraModule } from './lib/aurora';
 import type { SourceHealth } from './lib/health';
 import type { Host } from './lib/host';
 import { LightningModule } from './lib/lightning';
+import { EVENTS, Notifier, targetsFrom, type EventRule, type NotifyEvent } from './lib/notify';
 import {
     aircraftObjects,
     astronomyObjects,
@@ -20,7 +21,16 @@ import {
     satelliteObjects,
     type ObjectDef,
 } from './lib/objects';
-import { SatellitesModule, groupList } from './lib/satellites';
+import {
+    SatellitesModule,
+    catalogueNumber,
+    groupList,
+    keyOf,
+    nameOf,
+    satelliteOptions,
+    trackedIds,
+    type Tle,
+} from './lib/satellites';
 import { NM, clamp, num, receiverUrlOf, toLocation, type Location } from './lib/util';
 
 class Skyorama extends utils.Adapter {
@@ -30,6 +40,7 @@ class Skyorama extends utils.Adapter {
     private aircraft: AircraftModule | undefined;
     private aurora: AuroraModule | undefined;
     private lightning: LightningModule | undefined;
+    private notifier: Notifier | undefined;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -56,6 +67,27 @@ class Skyorama extends utils.Adapter {
         this.log.info(`Location ${home.lat.toFixed(3)}, ${home.lon.toFixed(3)}`);
 
         const sats = !!this.config.satellitesEnabled;
+        const tracked = trackedIds(this.config.trackedSatellites);
+        if (sats && tracked.capped) {
+            this.log.warn(
+                `More than ${tracked.ids.length} satellites selected: only the first ${tracked.ids.length} are tracked`,
+            );
+        }
+        // names from the saved orbit set, so the objects show them from the start
+        let savedTle: Tle[] = [];
+        try {
+            const j = JSON.parse(String((await this.getStateAsync('satellites.tle'))?.val || '{}')) as { sats?: Tle[] };
+            savedTle = Array.isArray(j.sats) ? j.sats : [];
+        } catch {
+            savedTle = [];
+        }
+        const trackedObjects = tracked.ids.map(id => ({
+            key: keyOf(id),
+            name: nameOf(
+                id,
+                savedTle.find(t => catalogueNumber(t[1]) === id),
+            ),
+        }));
         const astro = !!this.config.astronomyEnabled;
         const planes = !!this.config.aircraftEnabled;
         const receiver = receiverUrlOf(this.config.receiverUrl);
@@ -89,7 +121,7 @@ class Skyorama extends utils.Adapter {
         // Disabled modules keep their objects (and the user's history/alias settings on them).
         await this.ensureObjects([
             ...infoObjects(sources),
-            ...(sats ? satelliteObjects() : []),
+            ...(sats ? satelliteObjects(trackedObjects) : []),
             ...(astro ? astronomyObjects() : []),
             ...(background ? aircraftObjects() : []),
             ...(aurora ? auroraObjects() : []),
@@ -97,6 +129,9 @@ class Skyorama extends utils.Adapter {
         ]);
         if (this.unloaded) {
             return;
+        }
+        if (sats) {
+            await this.removeUntracked(trackedObjects.map(t => t.key));
         }
 
         const host: Host = {
@@ -106,7 +141,9 @@ class Skyorama extends utils.Adapter {
             stopped: () => this.unloaded,
             write: (id, val, always) => this.write(id, val, always),
             updateConnection: () => this.updateConnection(),
+            notify: (event, message) => this.notifier?.notify(event, message) ?? Promise.resolve(),
         };
+        this.notifier = this.createNotifier();
         if (sats) {
             this.satellites = new SatellitesModule(
                 host,
@@ -114,6 +151,7 @@ class Skyorama extends utils.Adapter {
                     groups: groupList(this.config.satelliteGroups),
                     leadMin: clamp(this.config.passAlertLeadMin, 1, 120, 10),
                     minEl: clamp(this.config.passAlertMinEl, 0, 90, 20),
+                    tracked: tracked.ids,
                 },
                 () => void this.astronomy?.refreshTonight(),
             );
@@ -131,7 +169,10 @@ class Skyorama extends utils.Adapter {
                 },
                 overheadEl: clamp(this.config.overheadElevation, 10, 90, 45),
             });
-            this.aircraft.start();
+            await this.aircraft.start();
+            if (this.unloaded) {
+                return;
+            }
         }
         if (aurora) {
             const instance = String(this.config.auroraNowcastInstance ?? '').trim();
@@ -163,6 +204,55 @@ class Skyorama extends utils.Adapter {
             return;
         }
         await this.lightning?.start();
+    }
+
+    /** A satellite removed from the selection takes its objects with it (its passes mean nothing any more). */
+    private async removeUntracked(keys: string[]): Promise<void> {
+        const view = await this.getObjectViewAsync('system', 'channel', {
+            startkey: `${this.namespace}.satellites.`,
+            endkey: `${this.namespace}.satellites.\u9999`,
+        });
+        for (const row of view.rows) {
+            const rel = row.id.slice(this.namespace.length + 1);
+            const m = /^satellites\.(iss|tiangong|n\d{1,9})$/.exec(rel);
+            if (m && !keys.includes(m[1]) && !this.unloaded) {
+                this.log.info(`Satellite ${m[1]} is no longer tracked: removing its states`);
+                await this.delObjectAsync(rel, { recursive: true });
+            }
+        }
+    }
+
+    /** Notification targets and per-event rules from the settings (clamped here, not only in the UI). */
+    private createNotifier(): Notifier {
+        const cfg = this.config as unknown as Record<string, unknown>;
+        const cap = (e: NotifyEvent): string => e.charAt(0).toUpperCase() + e.slice(1);
+        const rules = Object.fromEntries(
+            EVENTS.map(e => [
+                e,
+                {
+                    cooldownMs: clamp(cfg[`notify${cap(e)}Cooldown`], 0, 1440, 0) * 60_000,
+                    quietFrom: Math.round(clamp(cfg[`notify${cap(e)}QuietFrom`], 0, 23, 0)),
+                    quietTo: Math.round(clamp(cfg[`notify${cap(e)}QuietTo`], 0, 23, 0)),
+                },
+            ]),
+        ) as Record<NotifyEvent, EventRule>;
+        const targets = targetsFrom(this.config.notifyTargets);
+        const registerNotification = this.registerNotification.bind(this) as unknown as (
+            scope: string,
+            category: string,
+            message: string,
+        ) => Promise<void>;
+        return new Notifier(targets, rules, !!this.config.notifyAdmin, {
+            sendTo: (instance, command, payload) => {
+                if (!this.unloaded) {
+                    // fire and forget: every messaging adapter only answers when a callback is given
+                    this.sendTo(instance, command, payload as ioBroker.MessagePayload);
+                }
+            },
+            registerNotification: (category, message) =>
+                this.unloaded ? Promise.resolve() : registerNotification('skyorama', category, message),
+            log: this.log,
+        });
     }
 
     /** Home: system.config, or the manual location from the settings. */
@@ -249,6 +339,12 @@ class Skyorama extends utils.Adapter {
         switch (command) {
             case 'tle':
                 return this.satellites ? this.satellites.orbits : { error: 'Satellites module is off' };
+            case 'satelliteOptions':
+                // the settings' choice of satellites (selectSendTo): what the current orbit set contains
+                return satelliteOptions(
+                    this.satellites?.orbits.sats ?? [],
+                    trackedIds(this.config.trackedSatellites).ids,
+                );
             case 'aircraft':
                 if (!this.aircraft) {
                     return { error: 'Aircraft module is off' };

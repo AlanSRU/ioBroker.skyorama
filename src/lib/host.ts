@@ -1,6 +1,7 @@
 // What a module gets from the adapter.
 
 import type * as utils from '@iobroker/adapter-core';
+import type { NotifyEvent } from './notify';
 import type { Location } from './util';
 
 export interface Host {
@@ -13,4 +14,6 @@ export interface Host {
     write(id: string, val: ioBroker.StateValue, always?: boolean): Promise<void>;
     /** Re-evaluate info.connection from the sources' health. */
     updateConnection(): Promise<void>;
+    /** Send an alert to the configured messaging adapters / ioBroker notifications (quiet hours, cooldown apply). */
+    notify(event: NotifyEvent, message: string): Promise<void>;
 }

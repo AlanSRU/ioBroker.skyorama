@@ -183,6 +183,8 @@ interface Source<T> {
     value: T | null;
     at: number;
     nextAt: number;
+    /** fetched (successfully or not) since the instance started */
+    tried: boolean;
 }
 
 /** Runs the module: fetches while it is getting dark or dark, decides once a minute. */
@@ -206,6 +208,7 @@ export class AuroraModule {
             fetch,
             value: null,
             at: 0,
+            tried: false,
             // spread the load: a random first fetch within the first interval
             nextAt: Date.now() + 5_000 + Math.floor(Math.random() * minutes * 30_000),
         });
@@ -257,7 +260,12 @@ export class AuroraModule {
                     }
                 }
             }
-            await this.evaluate(sunAlt);
+            // After a (re)start at night, keep the restored states until every source has answered once:
+            // judging on no data would flip aurora.possible off and on again (and could alert twice).
+            const ready = [this.ovation, this.cloud, this.watch].every(s => !s || s.tried);
+            if (sunAlt >= DARK_SUN || ready) {
+                await this.evaluate(sunAlt);
+            }
         } finally {
             if (!this.host.stopped()) {
                 this.tickTimer = this.host.adapter.setTimeout(() => void this.tick(), TICK_MS);
@@ -267,6 +275,7 @@ export class AuroraModule {
 
     private async fetch(s: Source<unknown>): Promise<void> {
         s.nextAt = Date.now() + s.intervalMs;
+        s.tried = true;
         try {
             const v = await s.fetch();
             if (this.host.stopped()) {
@@ -321,6 +330,7 @@ export class AuroraModule {
         if (v.possible && !this.possible && now - this.lastAlertAt > ALERT_GAP_MS) {
             this.lastAlertAt = now;
             await this.host.write('aurora.alert', v.summary, true);
+            await this.host.notify('aurora', v.summary);
         }
         this.possible = v.possible;
     }

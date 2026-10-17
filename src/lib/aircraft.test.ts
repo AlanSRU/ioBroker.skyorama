@@ -119,21 +119,29 @@ describe('aircraft: summary', () => {
 });
 
 /** A fake adapter: real timers (cleared by stop()), delay recorded and skipped. */
-function harness(cfg: Partial<AircraftConfig> = {}): {
+function harness(
+    cfg: Partial<AircraftConfig> = {},
+    savedList?: string,
+): {
     mod: AircraftModule;
     urls: string[];
     delays: number[];
     writes: Map<string, unknown>;
     respond: (fn: (url: string) => unknown) => void;
+    notes: string[];
 } {
     const urls: string[] = [];
     const delays: number[] = [];
     const writes = new Map<string, unknown>();
+    const notes: string[] = [];
+    const saved: { list?: string } = { list: savedList };
     let handler: (url: string) => unknown = () => ({ ac: [] });
     const quiet = (): void => undefined;
     const adapter = {
         setTimeout: (fn: () => void, ms: number) => setTimeout(fn, ms),
         clearTimeout: (t: NodeJS.Timeout | undefined) => clearTimeout(t),
+        getStateAsync: (id: string) =>
+            Promise.resolve(id === 'aircraft.list' && saved.list ? { val: saved.list, ts: 0 } : null),
         delay: (ms: number) => {
             delays.push(ms);
             return Promise.resolve();
@@ -149,6 +157,10 @@ function harness(cfg: Partial<AircraftConfig> = {}): {
             return Promise.resolve();
         },
         updateConnection: () => Promise.resolve(),
+        notify: (event: string, message: string) => {
+            notes.push(`${event}|${message}`);
+            return Promise.resolve();
+        },
     } as unknown as Host;
     const fetchJson = async (url: string): Promise<unknown> => {
         urls.push(url);
@@ -169,7 +181,7 @@ function harness(cfg: Partial<AircraftConfig> = {}): {
         },
         { getJson: fetchJson, getText: () => Promise.resolve('') },
     );
-    return { mod, urls, delays, writes, respond: fn => (handler = fn) };
+    return { mod, urls, delays, writes, notes, respond: fn => (handler = fn) };
 }
 
 describe('aircraft: polling model', () => {
@@ -232,6 +244,29 @@ describe('aircraft: polling model', () => {
         expect(await h2.mod.aircraft(10)).to.deep.equal({ error: 'No aircraft data yet' });
         h.mod.stop();
         h2.mod.stop();
+    });
+
+    it('notifies once when an aircraft starts reporting an emergency (background polling)', async () => {
+        const h = harness({ background: { enabled: true, radiusNm: 16, intervalMs: 60_000 } });
+        h.respond(() => ({ ac: [raw('aaaaa1', 5, { squawk: '7700' }), raw('aaaaa2', 8)] }));
+        await h.mod.aircraft(10);
+        (h.mod as unknown as { cache: { at: number } }).cache.at -= 60_000;
+        await h.mod.aircraft(10); // still in an emergency: no second message
+        expect(h.notes).to.have.length(1);
+        expect(h.notes[0]).to.match(/^aircraftEmergency\|TSTaa1: emergency \(squawk 7700\), 9 km N$/);
+        h.mod.stop();
+    });
+
+    it('does not report an emergency again after a restart', async () => {
+        const h = harness(
+            { background: { enabled: true, radiusNm: 16, intervalMs: 60_000 } },
+            JSON.stringify([{ hex: 'aaaaa1', emergency: 'emergency' }]),
+        );
+        await h.mod.start();
+        h.respond(() => ({ ac: [raw('aaaaa1', 5, { squawk: '7700' })] }));
+        await h.mod.aircraft(10);
+        expect(h.notes).to.deep.equal([]);
+        h.mod.stop();
     });
 
     it('uses the local receiver and filters by distance itself', async () => {

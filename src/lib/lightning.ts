@@ -347,7 +347,9 @@ export class LightningModule {
             // the first near strike after a quiet spell is an alert
             if (latestNear.t - this.lastNearAt > QUIET_MS || !this.lastNearAt) {
                 const dir = compass(bearing(this.host.home.lat, this.host.home.lon, latestNear.lat, latestNear.lon));
-                await this.host.write('lightning.alert', `Lightning ${Math.round(latestNear.km)} km ${dir}`, true);
+                const text = `Lightning ${Math.round(latestNear.km)} km ${dir}`;
+                await this.host.write('lightning.alert', text, true);
+                await this.host.notify('lightning', text);
             }
             this.lastNearAt = latestNear.t;
             await this.host.write('lightning.lastNearAt', latestNear.t);

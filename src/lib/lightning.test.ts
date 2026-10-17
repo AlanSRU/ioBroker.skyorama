@@ -102,6 +102,7 @@ function harness(): {
             return Promise.resolve();
         },
         updateConnection: () => Promise.resolve(),
+        notify: () => Promise.resolve(),
     } as unknown as Host;
     const mod = new LightningModule(host, { radiusKm: 300, nearKm: 40 }, () => {
         const c = new FakeClient();
