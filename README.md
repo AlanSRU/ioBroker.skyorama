@@ -501,6 +501,9 @@ the log has the reason.
 * (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event
 * (Alan Paris) Meteor showers, eclipses seen from home, moon and planet events, stargazing cloud forecast, and an "upcoming" page (www)
 
+### 0.0.1 (2026-10-17)
+* (Alan Paris) initial release
+
 ## License
 MIT License
 
