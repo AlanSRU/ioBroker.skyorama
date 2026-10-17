@@ -1,345 +1,362 @@
 {
-    "common": {
-        "name": "skyorama",
-        "version": "0.0.1",
-        "news": {
-            "0.1.0": {
-                "en": "First test release: satellite passes and alerts, astronomy with meteor showers, eclipses and moon and planet events, stargazing forecast, aurora visibility, aircraft and lightning from your own sources, notifications, and optional sky dome, flight map and coming-up pages",
-                "de": "Erste Testversion: Satellitenüberflüge und Hinweise, Astronomie mit Meteorströmen, Finsternissen sowie Mond- und Planetenereignissen, Sternbeobachtungs-Vorhersage, Polarlicht-Sichtbarkeit, Flugzeuge und Blitze aus eigenen Quellen, Benachrichtigungen sowie optionale Seiten für Himmelskuppel, Flugkarte und Vorschau",
-                "ru": "Первая тестовая версия: пролёты спутников и оповещения, астрономия с метеорными потоками, затмениями и событиями Луны и планет, прогноз для наблюдения звёзд, видимость полярного сияния, самолёты и молнии из собственных источников, уведомления, а также дополнительные страницы с куполом неба, картой полётов и ближайшими событиями",
-                "pt": "Primeira versão de teste: passagens de satélites e alertas, astronomia com chuvas de meteoros, eclipses e eventos da Lua e dos planetas, previsão para observar as estrelas, visibilidade da aurora, aeronaves e relâmpagos de fontes próprias, notificações e páginas opcionais de cúpula do céu, mapa de voos e próximos eventos",
-                "nl": "Eerste testversie: satellietpassages en meldingen, sterrenkunde met meteorenzwermen, verduisteringen en maan- en planeetgebeurtenissen, sterrenkijkverwachting, zichtbaarheid van het noorderlicht, vliegtuigen en bliksem uit eigen bronnen, meldingen en optionele pagina's met hemelkoepel, vluchtkaart en binnenkort",
-                "fr": "Première version de test : passages de satellites et alertes, astronomie avec essaims de météores, éclipses et événements de la Lune et des planètes, prévisions pour observer les étoiles, visibilité des aurores, avions et foudre depuis vos propres sources, notifications, et pages facultatives du dôme céleste, de la carte des vols et des événements à venir",
-                "it": "Prima versione di prova: passaggi di satelliti e avvisi, astronomia con sciami meteorici, eclissi ed eventi di Luna e pianeti, previsioni per osservare le stelle, visibilità dell'aurora, aerei e fulmini da fonti proprie, notifiche e pagine opzionali con cupola del cielo, mappa dei voli e prossimi eventi",
-                "es": "Primera versión de prueba: pasos de satélites y avisos, astronomía con lluvias de meteoros, eclipses y eventos de la Luna y los planetas, previsión para observar las estrellas, visibilidad de la aurora, aviones y rayos de fuentes propias, notificaciones y páginas opcionales de cúpula celeste, mapa de vuelos y próximos eventos",
-                "pl": "Pierwsza wersja testowa: przeloty satelitów i powiadomienia, astronomia z rojami meteorów, zaćmieniami oraz zjawiskami Księżyca i planet, prognoza do obserwacji nieba, widoczność zorzy, samoloty i wyładowania z własnych źródeł, powiadomienia oraz opcjonalne strony z kopułą nieba, mapą lotów i nadchodzącymi zdarzeniami",
-                "uk": "Перша тестова версія: прольоти супутників і сповіщення, астрономія з метеорними потоками, затемненнями та подіями Місяця й планет, прогноз для спостереження зірок, видимість полярного сяйва, літаки й блискавки з власних джерел, сповіщення, а також додаткові сторінки з куполом неба, картою польотів і найближчими подіями",
-                "zh-cn": "首个测试版本：卫星过境与提醒，包含流星雨、日月食及月球和行星事件的天文信息，观星预报，极光可见性，来自您自己数据源的飞机和闪电，通知，以及可选的天穹、航班地图和即将发生页面"
-            },
-            "0.0.1": {
-                "en": "initial release",
-                "de": "Erstveröffentlichung",
-                "ru": "Начальная версия",
-                "pt": "lançamento inicial",
-                "nl": "Eerste uitgave",
-                "fr": "Première version",
-                "it": "Versione iniziale",
-                "es": "Versión inicial",
-                "pl": "Pierwsze wydanie",
-                "uk": "Початкова версія",
-                "zh-cn": "首次出版"
-            }
-        },
-        "titleLang": {
-            "en": "Skyorama",
-            "de": "Skyorama",
-            "ru": "Скайорама",
-            "pt": "Skyorama",
-            "nl": "Skyorama",
-            "fr": "Skyorama",
-            "it": "Skyorama",
-            "es": "Skyorama",
-            "pl": "Skyorama",
-            "uk": "Skyorama",
-            "zh-cn": "斯凯奥拉玛"
-        },
-        "desc": {
-            "en": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, tonight's sky, whether the aurora can be seen from home, and lightning nearby.",
-            "de": "Der Himmel über Ihrem Standort: Flugzeuge in der Nähe, sichtbare Überflüge von ISS und Tiangong, Dunkelheit, Mond und Planeten, der Himmel heute Nacht, ob Polarlicht von zu Hause aus zu sehen ist, und Blitze in der Nähe.",
-            "ru": "Небо над вашим местом: самолёты поблизости, видимые пролёты МКС и Тяньгун, темнота, Луна и планеты, небо этой ночью, видно ли полярное сияние из дома и молнии поблизости.",
-            "pt": "O céu sobre a sua localização: aviões nas proximidades, passagens visíveis da ISS e da Tiangong, escuridão, a Lua e os planetas, o céu desta noite, se a aurora pode ser vista de casa e relâmpagos por perto.",
-            "nl": "De hemel boven uw locatie: vliegtuigen in de buurt, zichtbare overkomsten van het ISS en Tiangong, duisternis, de maan en planeten, de hemel vannacht, of het poollicht vanuit huis te zien is, en bliksem in de buurt.",
-            "fr": "Le ciel au-dessus de chez vous : avions à proximité, survols visibles de l'ISS et de Tiangong, obscurité, la Lune et les planètes, le ciel de cette nuit, si l'aurore est visible depuis chez vous, et la foudre à proximité.",
-            "it": "Il cielo sopra la tua posizione: aerei nelle vicinanze, passaggi visibili della ISS e di Tiangong, oscurità, la Luna e i pianeti, il cielo di stanotte, se l'aurora è visibile da casa e fulmini nelle vicinanze.",
-            "es": "El cielo sobre tu ubicación: aviones cercanos, pasos visibles de la ISS y Tiangong, oscuridad, la Luna y los planetas, el cielo de esta noche, si la aurora se ve desde casa y rayos cercanos.",
-            "pl": "Niebo nad Twoją lokalizacją: samoloty w pobliżu, widoczne przeloty ISS i Tiangong, ciemność, Księżyc i planety, niebo tej nocy, czy zorza polarna jest widoczna z domu oraz wyładowania w pobliżu.",
-            "uk": "Небо над вашим місцем: літаки поблизу, видимі прольоти МКС і Тяньгун, темрява, Місяць і планети, небо цієї ночі, чи видно полярне сяйво з дому, та блискавки поблизу.",
-            "zh-cn": "您所在位置的天空：附近的飞机、国际空间站和天宫的可见过境、天黑程度、月亮和行星、今晚的天空、在家能否看到极光，以及附近的闪电。"
-        },
-        "authors": ["Alan Paris <alan.paris@scottish.rugby>"],
-        "keywords": ["sky", "aircraft", "ads-b", "satellites", "iss", "astronomy", "aurora", "lightning"],
-        "licenseInformation": {
-            "type": "free",
-            "license": "MIT"
-        },
-        "platform": "Javascript/Node.js",
-        "icon": "skyorama.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/AlanSRU/ioBroker.skyorama/main/admin/skyorama.png",
-        "readme": "https://github.com/AlanSRU/ioBroker.skyorama/blob/main/README.md",
-        "loglevel": "info",
-        "tier": 3,
-        "mode": "daemon",
-        "type": "misc-data",
-        "compact": true,
-        "connectionType": "cloud",
-        "dataSource": "poll",
-        "adminUI": {
-            "config": "json"
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=6.0.11"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.20"
-            }
-        ],
-        "supportedMessages": {
-            "custom": true
-        },
-        "nogit": true
+  "common": {
+    "name": "skyorama",
+    "version": "0.1.0",
+    "news": {
+      "0.1.0": {
+        "en": "First test release: satellite passes and alerts, astronomy with meteor showers, eclipses and moon and planet events, stargazing forecast, aurora visibility, aircraft and lightning from your own sources, notifications, and optional sky dome, flight map and coming-up pages",
+        "de": "Erste Testversion: Satellitenüberflüge und Hinweise, Astronomie mit Meteorströmen, Finsternissen sowie Mond- und Planetenereignissen, Sternbeobachtungs-Vorhersage, Polarlicht-Sichtbarkeit, Flugzeuge und Blitze aus eigenen Quellen, Benachrichtigungen sowie optionale Seiten für Himmelskuppel, Flugkarte und Vorschau",
+        "ru": "Первая тестовая версия: пролёты спутников и оповещения, астрономия с метеорными потоками, затмениями и событиями Луны и планет, прогноз для наблюдения звёзд, видимость полярного сияния, самолёты и молнии из собственных источников, уведомления, а также дополнительные страницы с куполом неба, картой полётов и ближайшими событиями",
+        "pt": "Primeira versão de teste: passagens de satélites e alertas, astronomia com chuvas de meteoros, eclipses e eventos da Lua e dos planetas, previsão para observar as estrelas, visibilidade da aurora, aeronaves e relâmpagos de fontes próprias, notificações e páginas opcionais de cúpula do céu, mapa de voos e próximos eventos",
+        "nl": "Eerste testversie: satellietpassages en meldingen, sterrenkunde met meteorenzwermen, verduisteringen en maan- en planeetgebeurtenissen, sterrenkijkverwachting, zichtbaarheid van het noorderlicht, vliegtuigen en bliksem uit eigen bronnen, meldingen en optionele pagina's met hemelkoepel, vluchtkaart en binnenkort",
+        "fr": "Première version de test : passages de satellites et alertes, astronomie avec essaims de météores, éclipses et événements de la Lune et des planètes, prévisions pour observer les étoiles, visibilité des aurores, avions et foudre depuis vos propres sources, notifications, et pages facultatives du dôme céleste, de la carte des vols et des événements à venir",
+        "it": "Prima versione di prova: passaggi di satelliti e avvisi, astronomia con sciami meteorici, eclissi ed eventi di Luna e pianeti, previsioni per osservare le stelle, visibilità dell'aurora, aerei e fulmini da fonti proprie, notifiche e pagine opzionali con cupola del cielo, mappa dei voli e prossimi eventi",
+        "es": "Primera versión de prueba: pasos de satélites y avisos, astronomía con lluvias de meteoros, eclipses y eventos de la Luna y los planetas, previsión para observar las estrellas, visibilidad de la aurora, aviones y rayos de fuentes propias, notificaciones y páginas opcionales de cúpula celeste, mapa de vuelos y próximos eventos",
+        "pl": "Pierwsza wersja testowa: przeloty satelitów i powiadomienia, astronomia z rojami meteorów, zaćmieniami oraz zjawiskami Księżyca i planet, prognoza do obserwacji nieba, widoczność zorzy, samoloty i wyładowania z własnych źródeł, powiadomienia oraz opcjonalne strony z kopułą nieba, mapą lotów i nadchodzącymi zdarzeniami",
+        "uk": "Перша тестова версія: прольоти супутників і сповіщення, астрономія з метеорними потоками, затемненнями та подіями Місяця й планет, прогноз для спостереження зірок, видимість полярного сяйва, літаки й блискавки з власних джерел, сповіщення, а також додаткові сторінки з куполом неба, картою польотів і найближчими подіями",
+        "zh-cn": "首个测试版本：卫星过境与提醒，包含流星雨、日月食及月球和行星事件的天文信息，观星预报，极光可见性，来自您自己数据源的飞机和闪电，通知，以及可选的天穹、航班地图和即将发生页面"
+      },
+      "0.0.1": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Начальная версия",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "uk": "Початкова версія",
+        "zh-cn": "首次出版"
+      }
     },
-    "native": {
-        "useSystemLocation": true,
-        "latitude": 0,
-        "longitude": 0,
-        "satellitesEnabled": true,
-        "satelliteGroups": "visual",
-        "trackedSatellites": ["25544", "48274"],
-        "passAlertLeadMin": 10,
-        "passAlertMinEl": 20,
-        "astronomyEnabled": true,
-        "skyForecastEnabled": true,
-        "aircraftEnabled": false,
-        "aircraftAreaUrl": "",
-        "aircraftLookupUrl": "",
-        "aircraftLookupUrl2": "",
-        "aircraftRouteUrl": "",
-        "aircraftHeaderName": "",
-        "aircraftHeaderValue": "",
-        "backgroundEnabled": false,
-        "backgroundRadiusKm": 30,
-        "backgroundIntervalS": 60,
-        "overheadElevation": 45,
-        "auroraEnabled": true,
-        "auroraNowcastInstance": "aurora-nowcast.0",
-        "auroraCloudLimit": 60,
-        "auroraWatchUk": false,
-        "lightningEnabled": false,
-        "lightningRadiusKm": 300,
-        "lightningNearKm": 40,
-        "lightningBrokerUrl": "",
-        "lightningTopicPrefix": "blitzortung/1.1",
-        "lightningUsername": "",
-        "lightningPassword": "",
-        "notifyTargets": [],
-        "notifyAdmin": false,
-        "notifySatellitePassCooldown": 0,
-        "notifySatellitePassQuietFrom": 0,
-        "notifySatellitePassQuietTo": 0,
-        "notifyAuroraCooldown": 0,
-        "notifyAuroraQuietFrom": 0,
-        "notifyAuroraQuietTo": 0,
-        "notifyLightningCooldown": 30,
-        "notifyLightningQuietFrom": 0,
-        "notifyLightningQuietTo": 0,
-        "notifyAircraftEmergencyCooldown": 30,
-        "notifyAircraftEmergencyQuietFrom": 0,
-        "notifyAircraftEmergencyQuietTo": 0,
-        "visualisationEnabled": false,
-        "mapTilesUrl": "",
-        "mapTilesAttribution": "",
-        "mapTilesDark": true
+    "titleLang": {
+      "en": "Skyorama",
+      "de": "Skyorama",
+      "ru": "Скайорама",
+      "pt": "Skyorama",
+      "nl": "Skyorama",
+      "fr": "Skyorama",
+      "it": "Skyorama",
+      "es": "Skyorama",
+      "pl": "Skyorama",
+      "uk": "Skyorama",
+      "zh-cn": "斯凯奥拉玛"
     },
-    "objects": [],
-    "instanceObjects": [
+    "desc": {
+      "en": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, tonight's sky, whether the aurora can be seen from home, and lightning nearby.",
+      "de": "Der Himmel über Ihrem Standort: Flugzeuge in der Nähe, sichtbare Überflüge von ISS und Tiangong, Dunkelheit, Mond und Planeten, der Himmel heute Nacht, ob Polarlicht von zu Hause aus zu sehen ist, und Blitze in der Nähe.",
+      "ru": "Небо над вашим местом: самолёты поблизости, видимые пролёты МКС и Тяньгун, темнота, Луна и планеты, небо этой ночью, видно ли полярное сияние из дома и молнии поблизости.",
+      "pt": "O céu sobre a sua localização: aviões nas proximidades, passagens visíveis da ISS e da Tiangong, escuridão, a Lua e os planetas, o céu desta noite, se a aurora pode ser vista de casa e relâmpagos por perto.",
+      "nl": "De hemel boven uw locatie: vliegtuigen in de buurt, zichtbare overkomsten van het ISS en Tiangong, duisternis, de maan en planeten, de hemel vannacht, of het poollicht vanuit huis te zien is, en bliksem in de buurt.",
+      "fr": "Le ciel au-dessus de chez vous : avions à proximité, survols visibles de l'ISS et de Tiangong, obscurité, la Lune et les planètes, le ciel de cette nuit, si l'aurore est visible depuis chez vous, et la foudre à proximité.",
+      "it": "Il cielo sopra la tua posizione: aerei nelle vicinanze, passaggi visibili della ISS e di Tiangong, oscurità, la Luna e i pianeti, il cielo di stanotte, se l'aurora è visibile da casa e fulmini nelle vicinanze.",
+      "es": "El cielo sobre tu ubicación: aviones cercanos, pasos visibles de la ISS y Tiangong, oscuridad, la Luna y los planetas, el cielo de esta noche, si la aurora se ve desde casa y rayos cercanos.",
+      "pl": "Niebo nad Twoją lokalizacją: samoloty w pobliżu, widoczne przeloty ISS i Tiangong, ciemność, Księżyc i planety, niebo tej nocy, czy zorza polarna jest widoczna z domu oraz wyładowania w pobliżu.",
+      "uk": "Небо над вашим місцем: літаки поблизу, видимі прольоти МКС і Тяньгун, темрява, Місяць і планети, небо цієї ночі, чи видно полярне сяйво з дому, та блискавки поблизу.",
+      "zh-cn": "您所在位置的天空：附近的飞机、国际空间站和天宫的可见过境、天黑程度、月亮和行星、今晚的天空、在家能否看到极光，以及附近的闪电。"
+    },
+    "authors": [
+      "Alan Paris <alan.paris@scottish.rugby>"
+    ],
+    "keywords": [
+      "sky",
+      "aircraft",
+      "ads-b",
+      "satellites",
+      "iss",
+      "astronomy",
+      "aurora",
+      "lightning"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "skyorama.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/AlanSRU/ioBroker.skyorama/main/admin/skyorama.png",
+    "readme": "https://github.com/AlanSRU/ioBroker.skyorama/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 3,
+    "mode": "daemon",
+    "type": "misc-data",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
+      }
+    ],
+    "supportedMessages": {
+      "custom": true
+    },
+    "nogit": true
+  },
+  "native": {
+    "useSystemLocation": true,
+    "latitude": 0,
+    "longitude": 0,
+    "satellitesEnabled": true,
+    "satelliteGroups": "visual",
+    "trackedSatellites": [
+      "25544",
+      "48274"
+    ],
+    "passAlertLeadMin": 10,
+    "passAlertMinEl": 20,
+    "astronomyEnabled": true,
+    "skyForecastEnabled": true,
+    "aircraftEnabled": false,
+    "aircraftAreaUrl": "",
+    "aircraftLookupUrl": "",
+    "aircraftLookupUrl2": "",
+    "aircraftRouteUrl": "",
+    "aircraftHeaderName": "",
+    "aircraftHeaderValue": "",
+    "backgroundEnabled": false,
+    "backgroundRadiusKm": 30,
+    "backgroundIntervalS": 60,
+    "overheadElevation": 45,
+    "auroraEnabled": true,
+    "auroraNowcastInstance": "aurora-nowcast.0",
+    "auroraCloudLimit": 60,
+    "auroraWatchUk": false,
+    "lightningEnabled": false,
+    "lightningRadiusKm": 300,
+    "lightningNearKm": 40,
+    "lightningBrokerUrl": "",
+    "lightningTopicPrefix": "blitzortung/1.1",
+    "lightningUsername": "",
+    "lightningPassword": "",
+    "notifyTargets": [],
+    "notifyAdmin": false,
+    "notifySatellitePassCooldown": 0,
+    "notifySatellitePassQuietFrom": 0,
+    "notifySatellitePassQuietTo": 0,
+    "notifyAuroraCooldown": 0,
+    "notifyAuroraQuietFrom": 0,
+    "notifyAuroraQuietTo": 0,
+    "notifyLightningCooldown": 30,
+    "notifyLightningQuietFrom": 0,
+    "notifyLightningQuietTo": 0,
+    "notifyAircraftEmergencyCooldown": 30,
+    "notifyAircraftEmergencyQuietFrom": 0,
+    "notifyAircraftEmergencyQuietTo": 0,
+    "visualisationEnabled": false,
+    "mapTilesUrl": "",
+    "mapTilesAttribution": "",
+    "mapTilesDark": true
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ],
+  "protectedNative": [
+    "notifyTargets",
+    "aircraftAreaUrl",
+    "aircraftLookupUrl",
+    "aircraftLookupUrl2",
+    "aircraftRouteUrl",
+    "aircraftHeaderValue",
+    "lightningBrokerUrl",
+    "lightningUsername",
+    "lightningPassword",
+    "mapTilesUrl"
+  ],
+  "notifications": [
+    {
+      "scope": "skyorama",
+      "name": {
+        "en": "Skyorama",
+        "de": "Skyorama",
+        "ru": "Skyorama",
+        "pt": "Skyorama",
+        "nl": "Skyorama",
+        "fr": "Skyorama",
+        "it": "Skyorama",
+        "es": "Skyorama",
+        "pl": "Skyorama",
+        "uk": "Skyorama",
+        "zh-cn": "Skyorama"
+      },
+      "description": {
+        "en": "Alerts about the sky over your location",
+        "de": "Warnungen zum Himmel über Ihrem Standort",
+        "ru": "Предупреждения о небе над вашим местом",
+        "pt": "Alertas sobre o céu sobre a sua localização",
+        "nl": "Waarschuwingen over de hemel boven uw locatie",
+        "fr": "Alertes sur le ciel au-dessus de chez vous",
+        "it": "Avvisi sul cielo sopra la tua posizione",
+        "es": "Alertas sobre el cielo sobre tu ubicación",
+        "pl": "Ostrzeżenia o niebie nad Twoją lokalizacją",
+        "uk": "Попередження про небо над вашим місцем",
+        "zh-cn": "关于您所在位置天空的提醒"
+      },
+      "categories": [
         {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
+          "category": "satellitePass",
+          "name": {
+            "en": "Satellite pass",
+            "de": "Überflug eines Satelliten",
+            "ru": "Пролёт спутника",
+            "pt": "Passagem de um satélite",
+            "nl": "Overkomst van een satelliet",
+            "fr": "Passage d'un satellite",
+            "it": "Passaggio di un satellite",
+            "es": "Paso de un satélite",
+            "pl": "Przelot satelity",
+            "uk": "Проліт супутника",
+            "zh-cn": "卫星过境"
+          },
+          "severity": "notify",
+          "description": {
+            "en": "A satellite you track will soon be visible from home",
+            "de": "Ein verfolgter Satellit ist bald von zu Hause aus sichtbar",
+            "ru": "Отслеживаемый спутник скоро будет виден из дома",
+            "pt": "Um satélite que segue vai estar visível de casa em breve",
+            "nl": "Een gevolgde satelliet is binnenkort vanuit huis te zien",
+            "fr": "Un satellite suivi sera bientôt visible depuis chez vous",
+            "it": "Un satellite seguito sarà presto visibile da casa",
+            "es": "Un satélite que sigue pronto será visible desde casa",
+            "pl": "Śledzony satelita wkrótce będzie widoczny z domu",
+            "uk": "Супутник, який ви відстежуєте, незабаром буде видно з дому",
+            "zh-cn": "您跟踪的卫星即将在家中可见"
+          },
+          "regex": [],
+          "limit": 5
         },
         {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
-    ],
-    "protectedNative": [
-        "notifyTargets",
-        "aircraftAreaUrl",
-        "aircraftLookupUrl",
-        "aircraftLookupUrl2",
-        "aircraftRouteUrl",
-        "aircraftHeaderValue",
-        "lightningBrokerUrl",
-        "lightningUsername",
-        "lightningPassword",
-        "mapTilesUrl"
-    ],
-    "notifications": [
+          "category": "aurora",
+          "name": {
+            "en": "Aurora",
+            "de": "Polarlicht",
+            "ru": "Полярное сияние",
+            "pt": "Aurora",
+            "nl": "Poollicht",
+            "fr": "Aurore",
+            "it": "Aurora",
+            "es": "Aurora",
+            "pl": "Zorza polarna",
+            "uk": "Полярне сяйво",
+            "zh-cn": "极光"
+          },
+          "severity": "notify",
+          "description": {
+            "en": "The aurora can be seen from home now",
+            "de": "Das Polarlicht ist jetzt von zu Hause aus zu sehen",
+            "ru": "Полярное сияние сейчас видно из дома",
+            "pt": "A aurora pode ser vista de casa agora",
+            "nl": "Het poollicht is nu vanuit huis te zien",
+            "fr": "L'aurore est visible depuis chez vous maintenant",
+            "it": "L'aurora è visibile da casa adesso",
+            "es": "La aurora se puede ver ahora desde casa",
+            "pl": "Zorza polarna jest teraz widoczna z domu",
+            "uk": "Полярне сяйво зараз видно з дому",
+            "zh-cn": "现在在家就能看到极光"
+          },
+          "regex": [],
+          "limit": 5
+        },
         {
-            "scope": "skyorama",
-            "name": {
-                "en": "Skyorama",
-                "de": "Skyorama",
-                "ru": "Skyorama",
-                "pt": "Skyorama",
-                "nl": "Skyorama",
-                "fr": "Skyorama",
-                "it": "Skyorama",
-                "es": "Skyorama",
-                "pl": "Skyorama",
-                "uk": "Skyorama",
-                "zh-cn": "Skyorama"
-            },
-            "description": {
-                "en": "Alerts about the sky over your location",
-                "de": "Warnungen zum Himmel über Ihrem Standort",
-                "ru": "Предупреждения о небе над вашим местом",
-                "pt": "Alertas sobre o céu sobre a sua localização",
-                "nl": "Waarschuwingen over de hemel boven uw locatie",
-                "fr": "Alertes sur le ciel au-dessus de chez vous",
-                "it": "Avvisi sul cielo sopra la tua posizione",
-                "es": "Alertas sobre el cielo sobre tu ubicación",
-                "pl": "Ostrzeżenia o niebie nad Twoją lokalizacją",
-                "uk": "Попередження про небо над вашим місцем",
-                "zh-cn": "关于您所在位置天空的提醒"
-            },
-            "categories": [
-                {
-                    "category": "satellitePass",
-                    "name": {
-                        "en": "Satellite pass",
-                        "de": "Überflug eines Satelliten",
-                        "ru": "Пролёт спутника",
-                        "pt": "Passagem de um satélite",
-                        "nl": "Overkomst van een satelliet",
-                        "fr": "Passage d'un satellite",
-                        "it": "Passaggio di un satellite",
-                        "es": "Paso de un satélite",
-                        "pl": "Przelot satelity",
-                        "uk": "Проліт супутника",
-                        "zh-cn": "卫星过境"
-                    },
-                    "severity": "notify",
-                    "description": {
-                        "en": "A satellite you track will soon be visible from home",
-                        "de": "Ein verfolgter Satellit ist bald von zu Hause aus sichtbar",
-                        "ru": "Отслеживаемый спутник скоро будет виден из дома",
-                        "pt": "Um satélite que segue vai estar visível de casa em breve",
-                        "nl": "Een gevolgde satelliet is binnenkort vanuit huis te zien",
-                        "fr": "Un satellite suivi sera bientôt visible depuis chez vous",
-                        "it": "Un satellite seguito sarà presto visibile da casa",
-                        "es": "Un satélite que sigue pronto será visible desde casa",
-                        "pl": "Śledzony satelita wkrótce będzie widoczny z domu",
-                        "uk": "Супутник, який ви відстежуєте, незабаром буде видно з дому",
-                        "zh-cn": "您跟踪的卫星即将在家中可见"
-                    },
-                    "regex": [],
-                    "limit": 5
-                },
-                {
-                    "category": "aurora",
-                    "name": {
-                        "en": "Aurora",
-                        "de": "Polarlicht",
-                        "ru": "Полярное сияние",
-                        "pt": "Aurora",
-                        "nl": "Poollicht",
-                        "fr": "Aurore",
-                        "it": "Aurora",
-                        "es": "Aurora",
-                        "pl": "Zorza polarna",
-                        "uk": "Полярне сяйво",
-                        "zh-cn": "极光"
-                    },
-                    "severity": "notify",
-                    "description": {
-                        "en": "The aurora can be seen from home now",
-                        "de": "Das Polarlicht ist jetzt von zu Hause aus zu sehen",
-                        "ru": "Полярное сияние сейчас видно из дома",
-                        "pt": "A aurora pode ser vista de casa agora",
-                        "nl": "Het poollicht is nu vanuit huis te zien",
-                        "fr": "L'aurore est visible depuis chez vous maintenant",
-                        "it": "L'aurora è visibile da casa adesso",
-                        "es": "La aurora se puede ver ahora desde casa",
-                        "pl": "Zorza polarna jest teraz widoczna z domu",
-                        "uk": "Полярне сяйво зараз видно з дому",
-                        "zh-cn": "现在在家就能看到极光"
-                    },
-                    "regex": [],
-                    "limit": 5
-                },
-                {
-                    "category": "lightning",
-                    "name": {
-                        "en": "Lightning",
-                        "de": "Blitze",
-                        "ru": "Молнии",
-                        "pt": "Relâmpagos",
-                        "nl": "Bliksem",
-                        "fr": "Foudre",
-                        "it": "Fulmini",
-                        "es": "Rayos",
-                        "pl": "Wyładowania",
-                        "uk": "Блискавки",
-                        "zh-cn": "闪电"
-                    },
-                    "severity": "notify",
-                    "description": {
-                        "en": "The first lightning strike nearby after a quiet spell",
-                        "de": "Der erste Blitzeinschlag in der Nähe nach einer ruhigen Zeit",
-                        "ru": "Первый разряд молнии поблизости после затишья",
-                        "pt": "A primeira descarga por perto após um período calmo",
-                        "nl": "De eerste blikseminslag in de buurt na een rustige periode",
-                        "fr": "Le premier impact de foudre à proximité après une période calme",
-                        "it": "Il primo fulmine nelle vicinanze dopo un periodo tranquillo",
-                        "es": "La primera descarga cercana tras un periodo tranquilo",
-                        "pl": "Pierwsze wyładowanie w pobliżu po spokojnym okresie",
-                        "uk": "Перший розряд блискавки поблизу після затишшя",
-                        "zh-cn": "安静一段时间后附近的第一次雷击"
-                    },
-                    "regex": [],
-                    "limit": 5
-                },
-                {
-                    "category": "aircraftEmergency",
-                    "name": {
-                        "en": "Aircraft emergency",
-                        "de": "Flugzeug-Notfall",
-                        "ru": "Чрезвычайная ситуация с самолётом",
-                        "pt": "Emergência de avião",
-                        "nl": "Noodgeval vliegtuig",
-                        "fr": "Urgence aérienne",
-                        "it": "Emergenza aerea",
-                        "es": "Emergencia de avión",
-                        "pl": "Sytuacja awaryjna samolotu",
-                        "uk": "Надзвичайна ситуація з літаком",
-                        "zh-cn": "飞机紧急情况"
-                    },
-                    "severity": "notify",
-                    "description": {
-                        "en": "An aircraft nearby reports an emergency",
-                        "de": "Ein Flugzeug in der Nähe meldet einen Notfall",
-                        "ru": "Самолёт поблизости сообщает о чрезвычайной ситуации",
-                        "pt": "Um avião nas proximidades comunica uma emergência",
-                        "nl": "Een vliegtuig in de buurt meldt een noodgeval",
-                        "fr": "Un avion à proximité signale une urgence",
-                        "it": "Un aereo nelle vicinanze segnala un'emergenza",
-                        "es": "Un avión cercano comunica una emergencia",
-                        "pl": "Samolot w pobliżu zgłasza sytuację awaryjną",
-                        "uk": "Літак поблизу повідомляє про надзвичайну ситуацію",
-                        "zh-cn": "附近的飞机报告紧急情况"
-                    },
-                    "regex": [],
-                    "limit": 5
-                }
-            ]
+          "category": "lightning",
+          "name": {
+            "en": "Lightning",
+            "de": "Blitze",
+            "ru": "Молнии",
+            "pt": "Relâmpagos",
+            "nl": "Bliksem",
+            "fr": "Foudre",
+            "it": "Fulmini",
+            "es": "Rayos",
+            "pl": "Wyładowania",
+            "uk": "Блискавки",
+            "zh-cn": "闪电"
+          },
+          "severity": "notify",
+          "description": {
+            "en": "The first lightning strike nearby after a quiet spell",
+            "de": "Der erste Blitzeinschlag in der Nähe nach einer ruhigen Zeit",
+            "ru": "Первый разряд молнии поблизости после затишья",
+            "pt": "A primeira descarga por perto após um período calmo",
+            "nl": "De eerste blikseminslag in de buurt na een rustige periode",
+            "fr": "Le premier impact de foudre à proximité après une période calme",
+            "it": "Il primo fulmine nelle vicinanze dopo un periodo tranquillo",
+            "es": "La primera descarga cercana tras un periodo tranquilo",
+            "pl": "Pierwsze wyładowanie w pobliżu po spokojnym okresie",
+            "uk": "Перший розряд блискавки поблизу після затишшя",
+            "zh-cn": "安静一段时间后附近的第一次雷击"
+          },
+          "regex": [],
+          "limit": 5
+        },
+        {
+          "category": "aircraftEmergency",
+          "name": {
+            "en": "Aircraft emergency",
+            "de": "Flugzeug-Notfall",
+            "ru": "Чрезвычайная ситуация с самолётом",
+            "pt": "Emergência de avião",
+            "nl": "Noodgeval vliegtuig",
+            "fr": "Urgence aérienne",
+            "it": "Emergenza aerea",
+            "es": "Emergencia de avión",
+            "pl": "Sytuacja awaryjna samolotu",
+            "uk": "Надзвичайна ситуація з літаком",
+            "zh-cn": "飞机紧急情况"
+          },
+          "severity": "notify",
+          "description": {
+            "en": "An aircraft nearby reports an emergency",
+            "de": "Ein Flugzeug in der Nähe meldet einen Notfall",
+            "ru": "Самолёт поблизости сообщает о чрезвычайной ситуации",
+            "pt": "Um avião nas proximidades comunica uma emergência",
+            "nl": "Een vliegtuig in de buurt meldt een noodgeval",
+            "fr": "Un avion à proximité signale une urgence",
+            "it": "Un aereo nelle vicinanze segnala un'emergenza",
+            "es": "Un avión cercano comunica una emergencia",
+            "pl": "Samolot w pobliżu zgłasza sytuację awaryjną",
+            "uk": "Літак поблизу повідомляє про надзвичайну ситуацію",
+            "zh-cn": "附近的飞机报告紧急情况"
+          },
+          "regex": [],
+          "limit": 5
         }
-    ],
-    "encryptedNative": ["aircraftHeaderValue", "lightningPassword"]
+      ]
+    }
+  ],
+  "encryptedNative": [
+    "aircraftHeaderValue",
+    "lightningPassword"
+  ]
 }
