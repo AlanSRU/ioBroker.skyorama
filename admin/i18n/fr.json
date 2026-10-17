@@ -29,5 +29,21 @@
     "Background interval (seconds)": "Intervalle en arrière-plan (secondes)",
     "How often the aircraft states are updated": "Fréquence de mise à jour des états des avions",
     "Overhead from (degrees above the horizon)": "Au-dessus de vous à partir de (degrés au-dessus de l'horizon)",
-    "An aircraft at least this high in the sky counts as overhead": "Un avion au moins aussi haut dans le ciel compte comme au-dessus de vous"
+    "An aircraft at least this high in the sky counts as overhead": "Un avion au moins aussi haut dans le ciel compte comme au-dessus de vous",
+    "Aurora": "Aurore",
+    "Aurora: can it be seen from home now?": "Aurore : est-elle visible depuis chez vous maintenant ?",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "Utilise la prévision d'aurores de la NOAA et la couverture nuageuse d'Open-Meteo, interrogées uniquement au crépuscule et la nuit",
+    "aurora-nowcast instance for the Kp index": "Instance aurora-nowcast pour l'indice Kp",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "Par exemple aurora-nowcast.0. Laissez vide si cet adaptateur n'est pas installé.",
+    "Cloud cover limit (%)": "Limite de couverture nuageuse (%)",
+    "With more cloud than this the aurora counts as not visible": "Au-delà de cette couverture nuageuse, l'aurore est considérée comme invisible",
+    "Use AuroraWatch UK (UK only)": "Utiliser AuroraWatch UK (Royaume-Uni uniquement)",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "Niveau d'alerte national de l'université de Lancaster ; ambre ou rouge compte comme assez proche",
+    "Lightning": "Foudre",
+    "Lightning nearby": "Foudre à proximité",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "Impacts du réseau communautaire Blitzortung (usage non commercial uniquement)",
+    "Strike radius (km)": "Rayon des impacts (km)",
+    "Strikes within this distance are kept for an hour": "Les impacts à cette distance ou moins sont conservés pendant une heure",
+    "Near radius (km)": "Rayon proche (km)",
+    "A strike this close after a quiet half hour raises the lightning alert": "Un impact aussi proche après une demi-heure calme déclenche l'alerte foudre"
 }

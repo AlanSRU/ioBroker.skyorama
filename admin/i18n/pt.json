@@ -29,5 +29,21 @@
     "Background interval (seconds)": "Intervalo em segundo plano (segundos)",
     "How often the aircraft states are updated": "Com que frequência os estados dos aviões são atualizados",
     "Overhead from (degrees above the horizon)": "Por cima a partir de (graus acima do horizonte)",
-    "An aircraft at least this high in the sky counts as overhead": "Um avião pelo menos a esta altura no céu conta como estando por cima"
+    "An aircraft at least this high in the sky counts as overhead": "Um avião pelo menos a esta altura no céu conta como estando por cima",
+    "Aurora": "Aurora",
+    "Aurora: can it be seen from home now?": "Aurora: pode ser vista de casa agora?",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "Usa a previsão de auroras da NOAA e a nebulosidade do Open-Meteo, consultadas apenas ao anoitecer e de noite",
+    "aurora-nowcast instance for the Kp index": "Instância aurora-nowcast para o índice Kp",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "Por exemplo aurora-nowcast.0. Deixe vazio se esse adaptador não estiver instalado.",
+    "Cloud cover limit (%)": "Limite de nebulosidade (%)",
+    "With more cloud than this the aurora counts as not visible": "Com mais nuvens do que isto, a aurora conta como não visível",
+    "Use AuroraWatch UK (UK only)": "Usar AuroraWatch UK (só Reino Unido)",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "Nível de alerta nacional da Universidade de Lancaster; âmbar ou vermelho conta como suficientemente perto",
+    "Lightning": "Relâmpagos",
+    "Lightning nearby": "Relâmpagos por perto",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "Descargas da rede comunitária Blitzortung (apenas uso não comercial)",
+    "Strike radius (km)": "Raio das descargas (km)",
+    "Strikes within this distance are kept for an hour": "As descargas dentro desta distância são guardadas durante uma hora",
+    "Near radius (km)": "Raio próximo (km)",
+    "A strike this close after a quiet half hour raises the lightning alert": "Uma descarga tão próxima após meia hora calma dispara o alerta de relâmpagos"
 }

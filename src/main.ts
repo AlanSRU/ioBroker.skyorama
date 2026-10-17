@@ -5,10 +5,21 @@
 
 import * as utils from '@iobroker/adapter-core';
 import { AircraftModule, MAX_RADIUS_NM, hexOf } from './lib/aircraft';
+import { connect } from 'mqtt';
 import { AstronomyModule } from './lib/astronomy';
+import { AuroraModule } from './lib/aurora';
 import type { SourceHealth } from './lib/health';
 import type { Host } from './lib/host';
-import { aircraftObjects, astronomyObjects, infoObjects, satelliteObjects, type ObjectDef } from './lib/objects';
+import { LightningModule } from './lib/lightning';
+import {
+    aircraftObjects,
+    astronomyObjects,
+    auroraObjects,
+    infoObjects,
+    lightningObjects,
+    satelliteObjects,
+    type ObjectDef,
+} from './lib/objects';
 import { SatellitesModule, groupList } from './lib/satellites';
 import { NM, clamp, num, receiverUrlOf, toLocation, type Location } from './lib/util';
 
@@ -17,6 +28,8 @@ class Skyorama extends utils.Adapter {
     private satellites: SatellitesModule | undefined;
     private astronomy: AstronomyModule | undefined;
     private aircraft: AircraftModule | undefined;
+    private aurora: AuroraModule | undefined;
+    private lightning: LightningModule | undefined;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -52,6 +65,9 @@ class Skyorama extends utils.Adapter {
         }
         const receiverUrl = receiver.url;
         const background = planes && !!this.config.backgroundEnabled;
+        const aurora = !!this.config.auroraEnabled;
+        const auroraWatch = aurora && !!this.config.auroraWatchUk;
+        const lightning = !!this.config.lightningEnabled;
         const sources = [
             ...(sats ? [{ id: 'celestrak', name: 'CelesTrak' }] : []),
             ...(planes
@@ -61,6 +77,14 @@ class Skyorama extends utils.Adapter {
                   ]
                 : []),
             ...(planes && receiverUrl ? [{ id: 'receiver', name: 'Local receiver' }] : []),
+            ...(aurora
+                ? [
+                      { id: 'noaa', name: 'NOAA SWPC' },
+                      { id: 'openmeteo', name: 'Open-Meteo' },
+                  ]
+                : []),
+            ...(auroraWatch ? [{ id: 'aurorawatch', name: 'AuroraWatch UK' }] : []),
+            ...(lightning ? [{ id: 'blitzortung', name: 'Blitzortung' }] : []),
         ];
         // Disabled modules keep their objects (and the user's history/alias settings on them).
         await this.ensureObjects([
@@ -68,6 +92,8 @@ class Skyorama extends utils.Adapter {
             ...(sats ? satelliteObjects() : []),
             ...(astro ? astronomyObjects() : []),
             ...(background ? aircraftObjects() : []),
+            ...(aurora ? auroraObjects() : []),
+            ...(lightning ? lightningObjects() : []),
         ]);
         if (this.unloaded) {
             return;
@@ -107,12 +133,36 @@ class Skyorama extends utils.Adapter {
             });
             this.aircraft.start();
         }
+        if (aurora) {
+            const instance = String(this.config.auroraNowcastInstance ?? '').trim();
+            this.aurora = new AuroraModule(host, {
+                cloudLimit: clamp(this.config.auroraCloudLimit, 0, 100, 60),
+                auroraWatch,
+                nowcastInstance: /^aurora-nowcast\.\d{1,3}$/.test(instance) ? instance : '',
+            });
+        }
+        if (lightning) {
+            const radiusKm = clamp(this.config.lightningRadiusKm, 10, 1000, 300);
+            this.lightning = new LightningModule(
+                host,
+                { radiusKm, nearKm: clamp(this.config.lightningNearKm, 1, radiusKm, 40) },
+                connect,
+            );
+        }
         await this.updateConnection();
         await this.satellites?.start();
         if (this.unloaded) {
             return;
         }
         await this.astronomy?.start();
+        if (this.unloaded) {
+            return;
+        }
+        await this.aurora?.start();
+        if (this.unloaded) {
+            return;
+        }
+        await this.lightning?.start();
     }
 
     /** Home: system.config, or the manual location from the settings. */
@@ -158,6 +208,8 @@ class Skyorama extends utils.Adapter {
         const all: SourceHealth[] = [
             ...(this.satellites ? [this.satellites.health] : []),
             ...(this.aircraft?.sources ?? []),
+            ...(this.aurora?.sources ?? []),
+            ...(this.lightning ? [this.lightning.health] : []),
         ];
         let ok = true;
         for (const h of all) {
@@ -236,6 +288,8 @@ class Skyorama extends utils.Adapter {
             this.satellites?.stop();
             this.astronomy?.stop();
             this.aircraft?.stop();
+            this.aurora?.stop();
+            this.lightning?.stop();
             void this.setState('info.connection', false, true);
             callback();
         } catch (error) {

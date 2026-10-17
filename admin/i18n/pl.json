@@ -29,5 +29,21 @@
     "Background interval (seconds)": "Interwał w tle (sekundy)",
     "How often the aircraft states are updated": "Jak często aktualizowane są stany samolotów",
     "Overhead from (degrees above the horizon)": "Nad głową od (stopni nad horyzontem)",
-    "An aircraft at least this high in the sky counts as overhead": "Samolot co najmniej tak wysoko na niebie liczy się jako nad głową"
+    "An aircraft at least this high in the sky counts as overhead": "Samolot co najmniej tak wysoko na niebie liczy się jako nad głową",
+    "Aurora": "Zorza polarna",
+    "Aurora: can it be seen from home now?": "Zorza polarna: czy widać ją teraz z domu?",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "Korzysta z prognozy zorzy NOAA i zachmurzenia z Open-Meteo, pobieranych tylko o zmierzchu i w nocy",
+    "aurora-nowcast instance for the Kp index": "Instancja aurora-nowcast dla indeksu Kp",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "Na przykład aurora-nowcast.0. Pozostaw puste, jeśli ten adapter nie jest zainstalowany.",
+    "Cloud cover limit (%)": "Limit zachmurzenia (%)",
+    "With more cloud than this the aurora counts as not visible": "Przy większym zachmurzeniu zorza uznawana jest za niewidoczną",
+    "Use AuroraWatch UK (UK only)": "Użyj AuroraWatch UK (tylko Wielka Brytania)",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "Ogólnokrajowy poziom ostrzeżenia Uniwersytetu Lancaster; bursztynowy lub czerwony oznacza wystarczająco blisko",
+    "Lightning": "Wyładowania",
+    "Lightning nearby": "Wyładowania w pobliżu",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "Wyładowania z sieci społecznościowej Blitzortung (tylko do użytku niekomercyjnego)",
+    "Strike radius (km)": "Promień wyładowań (km)",
+    "Strikes within this distance are kept for an hour": "Wyładowania w tej odległości są przechowywane przez godzinę",
+    "Near radius (km)": "Promień bliski (km)",
+    "A strike this close after a quiet half hour raises the lightning alert": "Tak bliskie wyładowanie po spokojnej półgodzinie wywołuje alarm burzowy"
 }

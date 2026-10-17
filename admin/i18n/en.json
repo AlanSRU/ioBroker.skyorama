@@ -29,5 +29,21 @@
     "Background interval (seconds)": "Background interval (seconds)",
     "How often the aircraft states are updated": "How often the aircraft states are updated",
     "Overhead from (degrees above the horizon)": "Overhead from (degrees above the horizon)",
-    "An aircraft at least this high in the sky counts as overhead": "An aircraft at least this high in the sky counts as overhead"
+    "An aircraft at least this high in the sky counts as overhead": "An aircraft at least this high in the sky counts as overhead",
+    "Aurora": "Aurora",
+    "Aurora: can it be seen from home now?": "Aurora: can it be seen from home now?",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark",
+    "aurora-nowcast instance for the Kp index": "aurora-nowcast instance for the Kp index",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "For example aurora-nowcast.0. Leave empty if that adapter is not installed.",
+    "Cloud cover limit (%)": "Cloud cover limit (%)",
+    "With more cloud than this the aurora counts as not visible": "With more cloud than this the aurora counts as not visible",
+    "Use AuroraWatch UK (UK only)": "Use AuroraWatch UK (UK only)",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "UK-wide alert level from Lancaster University; amber or red counts as near enough",
+    "Lightning": "Lightning",
+    "Lightning nearby": "Lightning nearby",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "Strikes from the Blitzortung community network (non-commercial use only)",
+    "Strike radius (km)": "Strike radius (km)",
+    "Strikes within this distance are kept for an hour": "Strikes within this distance are kept for an hour",
+    "Near radius (km)": "Near radius (km)",
+    "A strike this close after a quiet half hour raises the lightning alert": "A strike this close after a quiet half hour raises the lightning alert"
 }

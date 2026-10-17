@@ -1,6 +1,14 @@
 import { expect } from 'chai';
 import { instanceObjects } from '../../io-package.json';
-import { aircraftObjects, astronomyObjects, infoObjects, satelliteObjects, type ObjectDef } from './objects';
+import {
+    aircraftObjects,
+    astronomyObjects,
+    auroraObjects,
+    infoObjects,
+    lightningObjects,
+    satelliteObjects,
+    type ObjectDef,
+} from './objects';
 
 const all: ObjectDef[] = [
     ...instanceObjects.map(o => ({ id: o._id, obj: o as unknown as ioBroker.SettableObject })),
@@ -9,10 +17,16 @@ const all: ObjectDef[] = [
         { id: 'adsblol', name: 'adsb.lol' },
         { id: 'adsbfi', name: 'adsb.fi' },
         { id: 'receiver', name: 'Local receiver' },
+        { id: 'noaa', name: 'NOAA SWPC' },
+        { id: 'openmeteo', name: 'Open-Meteo' },
+        { id: 'aurorawatch', name: 'AuroraWatch UK' },
+        { id: 'blitzortung', name: 'Blitzortung' },
     ]),
     ...satelliteObjects(),
     ...astronomyObjects(),
     ...aircraftObjects(),
+    ...auroraObjects(),
+    ...lightningObjects(),
 ];
 
 /** Roles used, with what the role list (repochecker config_StateRoles.js) requires of them. */

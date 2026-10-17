@@ -200,6 +200,104 @@
                     "xl": 3
                 }
             }
+        },
+        "auroraTab": {
+            "type": "panel",
+            "label": "Aurora",
+            "items": {
+                "auroraEnabled": {
+                    "type": "checkbox",
+                    "label": "Aurora: can it be seen from home now?",
+                    "help": "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "auroraNowcastInstance": {
+                    "type": "text",
+                    "label": "aurora-nowcast instance for the Kp index",
+                    "help": "For example aurora-nowcast.0. Leave empty if that adapter is not installed.",
+                    "disabled": "!data.auroraEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "auroraCloudLimit": {
+                    "type": "number",
+                    "label": "Cloud cover limit (%)",
+                    "help": "With more cloud than this the aurora counts as not visible",
+                    "min": 0,
+                    "max": 100,
+                    "disabled": "!data.auroraEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "auroraWatchUk": {
+                    "type": "checkbox",
+                    "label": "Use AuroraWatch UK (UK only)",
+                    "help": "UK-wide alert level from Lancaster University; amber or red counts as near enough",
+                    "disabled": "!data.auroraEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
+        },
+        "lightningTab": {
+            "type": "panel",
+            "label": "Lightning",
+            "items": {
+                "lightningEnabled": {
+                    "type": "checkbox",
+                    "label": "Lightning nearby",
+                    "help": "Strikes from the Blitzortung community network (non-commercial use only)",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "lightningRadiusKm": {
+                    "type": "number",
+                    "label": "Strike radius (km)",
+                    "help": "Strikes within this distance are kept for an hour",
+                    "min": 10,
+                    "max": 1000,
+                    "disabled": "!data.lightningEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "lightningNearKm": {
+                    "type": "number",
+                    "label": "Near radius (km)",
+                    "help": "A strike this close after a quiet half hour raises the lightning alert",
+                    "min": 1,
+                    "max": 1000,
+                    "disabled": "!data.lightningEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
         }
     }
 }

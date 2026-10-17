@@ -3,7 +3,7 @@
     "target": "directory",
     "adapterName": "skyorama",
     "title": "Skyorama",
-    "description": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
+    "description": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, tonight's sky, whether the aurora can be seen from home, and lightning nearby.",
     "keywords": [
         "sky",
         "aircraft",
@@ -11,8 +11,8 @@
         "satellites",
         "iss",
         "astronomy",
-        "moon",
-        "planets"
+        "aurora",
+        "lightning"
     ],
     "contributors": [],
     "expert": "yes",

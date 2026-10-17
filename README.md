@@ -13,7 +13,8 @@
 ## Skyorama adapter for ioBroker
 
 What is in the sky over your location, as ioBroker states for automations, dashboards and alerts: aircraft nearby, the
-visible passes of the space stations, the moon and planets, how dark it is and what is worth looking at tonight.
+visible passes of the space stations, the moon and planets, how dark it is, what is worth looking at tonight, whether
+the aurora can be seen from home right now, and lightning nearby.
 Front-ends (dashboards, maps) can also ask the adapter directly for aircraft, a followed aircraft's position and
 aircraft details.
 
@@ -35,6 +36,30 @@ Each module can be switched on or off in the instance settings. Switching a modu
 - Details for one aircraft (route, photo, airline) come from the [VRS standing data](https://github.com/vradarserver/standing-data)
   and [planespotters.net](https://www.planespotters.net/) (photos are returned with the photographer's name and a link,
   as their terms ask). They are loaded only when asked for and cached (routes 1 day, photos 7 days).
+
+#### Aurora
+
+Whether the aurora can actually be seen from home now, not just whether there is a geomagnetic storm somewhere:
+
+- **dark enough**: the sun more than 12° below the horizon;
+- **near enough**: the [NOAA SWPC OVATION](https://www.swpc.noaa.gov/products/aurora-30-minute-forecast) aurora
+  forecast shows at least 10 % within 3° of latitude of you (usually poleward, where it shows low on the horizon; at
+  high latitudes it can also be overhead or to the south, and the text says where to look), or
+  [AuroraWatch UK](https://aurorawatch.lancs.ac.uk/) is amber or red (optional, for the UK);
+- **not overcast**: cloud cover at home from [Open-Meteo](https://open-meteo.com/) below a limit (default 60 %).
+
+These are fetched only while it is getting dark or dark (OVATION every 10 minutes, cloud every 15, AuroraWatch UK
+every 5). If the [aurora-nowcast](https://github.com/chrmenne/ioBroker.aurora-nowcast) adapter is installed, its Kp
+index is added to the text. An alert text is written when the aurora turns possible, at most once every 6 hours.
+
+#### Lightning
+
+Strikes from the [Blitzortung.org](https://www.blitzortung.org/) community lightning network, received through the
+public MQTT feed run for Home Assistant's Blitzortung integration. The adapter subscribes only to the area around you
+(the geohash cells that cover the configured radius). Off by default. Blitzortung data may be used for private,
+non-commercial purposes only.
+
+An alert text is written for the first strike within the near radius (default 40 km) after half an hour without one.
 
 #### Satellites
 
@@ -75,6 +100,15 @@ also Omega Centauri and the Magellanic Clouds).
 | `astronomy.moon.*` | `phase`, `illumination` (%), `elevation` (°), next `rise` and `set` |
 | `astronomy.planets.<name>.*` | `visible`, `elevation`, `azimuth`, next `rise` and `set`, `magnitude` |
 | `astronomy.tonight` / `astronomy.tonightText` | Tonight's sky as JSON and as one line of text |
+| `aurora.possible` | The aurora can be seen from home now (dark, near enough, not overcast) |
+| `aurora.reason` / `aurora.summary` | Why or why not, and one line of text, e.g. "Unlikely from home: not dark" |
+| `aurora.inputs` | Everything the decision used (JSON) |
+| `aurora.alert` | Alert text, written when the aurora turns possible (at most every 6 hours) |
+| `lightning.nearestKm` / `lightning.count1h` | Nearest strike (km) and number of strikes within the radius, last hour |
+| `lightning.lastNearAt` | Time of the latest strike within the near radius |
+| `lightning.strikes` | The newest strikes (up to 1000) within the radius in the last hour, updated at most once a minute (JSON `{ at, radiusKm, total, strikes: [{ lat, lon, t, km }] }`) |
+| `lightning.alert` | Alert text for the first near strike after a quiet half hour |
+| `info.noaa` / `info.openmeteo` / `info.aurorawatch` / `info.blitzortung` | Those sources reachable |
 
 Times are timestamps in milliseconds. A value that does not exist (for example no next moonrise in the polar summer)
 is `null`.
@@ -97,10 +131,19 @@ sendTo('skyorama.0', 'aircraft', { radiusNm: 20 }, result => {
 });
 ```
 
+### Related adapters
+
+- [JetFrame](https://github.com/backfisch88/ioBroker.jetframe) is a complete plane-spotting display: it shows the
+  aircraft passing your window, with photos, runway detection and daily statistics in its own web app. Use it if that
+  is what you want. Skyorama's aircraft module is a data source instead: states for automations and a `sendTo` API for
+  your own dashboards and maps, next to the rest of the sky.
+- [aurora-nowcast](https://github.com/chrmenne/ioBroker.aurora-nowcast) provides the aurora probability at your
+  location, the Kp index and solar wind data. Skyorama's aurora module adds "can I see it from here now" (darkness,
+  cloud, aurora low on the horizon) and uses aurora-nowcast's Kp when it is installed.
+
 ### Roadmap
 
-The chance of seeing the aurora, nearby lightning, notifications to messaging adapters, and an optional overhead-dome
-and flight-map visualisation.
+Notifications to messaging adapters, and an optional overhead-dome and flight-map visualisation.
 
 ## Changelog
 <!--
@@ -111,6 +154,7 @@ and flight-map visualisation.
 ### **WORK IN PROGRESS**
 * (Alan Paris) Satellites (ISS and Tiangong passes, pass alerts, orbit set) and astronomy (darkness, moon, planets, tonight's sky)
 * (Alan Paris) Aircraft: nearby aircraft, following one aircraft and aircraft details for front-ends, optional background states
+* (Alan Paris) Aurora (visible from home now?) and lightning nearby (Blitzortung)
 
 ## License
 MIT License

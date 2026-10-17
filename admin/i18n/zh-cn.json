@@ -29,5 +29,21 @@
     "Background interval (seconds)": "后台间隔（秒）",
     "How often the aircraft states are updated": "飞机状态的更新频率",
     "Overhead from (degrees above the horizon)": "头顶判定（地平线以上度数）",
-    "An aircraft at least this high in the sky counts as overhead": "在天空中至少达到此高度的飞机视为在头顶"
+    "An aircraft at least this high in the sky counts as overhead": "在天空中至少达到此高度的飞机视为在头顶",
+    "Aurora": "极光",
+    "Aurora: can it be seen from home now?": "极光：现在在家能看到吗？",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "使用 NOAA 极光预报和 Open-Meteo 云量，仅在黄昏和夜间获取",
+    "aurora-nowcast instance for the Kp index": "用于 Kp 指数的 aurora-nowcast 实例",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "例如 aurora-nowcast.0。如果未安装该适配器，请留空。",
+    "Cloud cover limit (%)": "云量上限（%）",
+    "With more cloud than this the aurora counts as not visible": "云量超过此值时，极光视为不可见",
+    "Use AuroraWatch UK (UK only)": "使用 AuroraWatch UK（仅限英国）",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "兰卡斯特大学发布的英国全国预警等级；琥珀色或红色视为足够近",
+    "Lightning": "闪电",
+    "Lightning nearby": "附近的闪电",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "来自 Blitzortung 社区网络的雷击（仅限非商业用途）",
+    "Strike radius (km)": "雷击半径（公里）",
+    "Strikes within this distance are kept for an hour": "此距离内的雷击保留一小时",
+    "Near radius (km)": "近距离半径（公里）",
+    "A strike this close after a quiet half hour raises the lightning alert": "安静半小时后出现这么近的雷击会触发闪电警报"
 }

@@ -29,5 +29,21 @@
     "Background interval (seconds)": "Intervallo in background (secondi)",
     "How often the aircraft states are updated": "Ogni quanto vengono aggiornati gli stati degli aerei",
     "Overhead from (degrees above the horizon)": "Sopra di te da (gradi sopra l'orizzonte)",
-    "An aircraft at least this high in the sky counts as overhead": "Un aereo almeno così alto nel cielo conta come sopra di te"
+    "An aircraft at least this high in the sky counts as overhead": "Un aereo almeno così alto nel cielo conta come sopra di te",
+    "Aurora": "Aurora",
+    "Aurora: can it be seen from home now?": "Aurora: è visibile da casa adesso?",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "Usa la previsione delle aurore della NOAA e la nuvolosità di Open-Meteo, interrogate solo al crepuscolo e di notte",
+    "aurora-nowcast instance for the Kp index": "Istanza aurora-nowcast per l'indice Kp",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "Ad esempio aurora-nowcast.0. Lasciare vuoto se quell'adattatore non è installato.",
+    "Cloud cover limit (%)": "Limite di nuvolosità (%)",
+    "With more cloud than this the aurora counts as not visible": "Con più nuvole di così l'aurora è considerata non visibile",
+    "Use AuroraWatch UK (UK only)": "Usa AuroraWatch UK (solo Regno Unito)",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "Livello di allerta nazionale dell'Università di Lancaster; ambra o rosso conta come abbastanza vicino",
+    "Lightning": "Fulmini",
+    "Lightning nearby": "Fulmini nelle vicinanze",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "Fulmini dalla rete comunitaria Blitzortung (solo uso non commerciale)",
+    "Strike radius (km)": "Raggio dei fulmini (km)",
+    "Strikes within this distance are kept for an hour": "I fulmini entro questa distanza vengono conservati per un'ora",
+    "Near radius (km)": "Raggio vicino (km)",
+    "A strike this close after a quiet half hour raises the lightning alert": "Un fulmine così vicino dopo mezz'ora tranquilla attiva l'allerta fulmini"
 }

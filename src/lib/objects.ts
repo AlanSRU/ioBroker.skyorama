@@ -133,3 +133,34 @@ export function astronomyObjects(): ObjectDef[] {
     }
     return out;
 }
+
+export function auroraObjects(): ObjectDef[] {
+    return [
+        channel('aurora', 'Aurora'),
+        flag('aurora.possible', 'Aurora possible from home now'),
+        text('aurora.reason', 'Why (or why not)'),
+        text('aurora.summary', 'Aurora chance from home'),
+        json('aurora.inputs', 'Aurora inputs (JSON)', '{}'),
+        text('aurora.alert', 'Aurora alert'),
+    ];
+}
+
+export function lightningObjects(): ObjectDef[] {
+    return [
+        channel('lightning', 'Lightning'),
+        state('lightning.nearestKm', {
+            name: 'Nearest strike in the last hour',
+            type: 'number',
+            role: 'value.distance',
+            unit: 'km',
+        }),
+        state('lightning.count1h', {
+            name: 'Strikes within the radius in the last hour',
+            type: 'number',
+            role: 'value',
+        }),
+        time('lightning.lastNearAt', 'Latest strike within the near radius'),
+        json('lightning.strikes', 'Strikes within the radius in the last hour (JSON)', '{"strikes":[]}'),
+        text('lightning.alert', 'Lightning alert'),
+    ];
+}

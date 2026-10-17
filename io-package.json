@@ -31,20 +31,20 @@
             "zh-cn": "斯凯奥拉玛"
         },
         "desc": {
-            "en": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
-            "de": "Der Himmel über Ihrem Standort: Flugzeuge in der Nähe, sichtbare Überflüge von ISS und Tiangong, Dunkelheit, Mond und Planeten und was heute Nacht sehenswert ist.",
-            "ru": "Небо над вашим местом: самолёты поблизости, видимые пролёты МКС и Тяньгун, темнота, Луна и планеты и то, на что стоит посмотреть этой ночью.",
-            "pt": "O céu sobre a sua localização: aviões nas proximidades, passagens visíveis da ISS e da Tiangong, escuridão, a Lua e os planetas e o que vale a pena observar esta noite.",
-            "nl": "De hemel boven uw locatie: vliegtuigen in de buurt, zichtbare overkomsten van het ISS en Tiangong, duisternis, de maan en planeten, en wat vannacht de moeite waard is.",
-            "fr": "Le ciel au-dessus de chez vous : avions à proximité, survols visibles de l'ISS et de Tiangong, obscurité, la Lune et les planètes, et ce qui vaut la peine d'être observé cette nuit.",
-            "it": "Il cielo sopra la tua posizione: aerei nelle vicinanze, passaggi visibili della ISS e di Tiangong, oscurità, la Luna e i pianeti e cosa vale la pena osservare stanotte.",
-            "es": "El cielo sobre tu ubicación: aviones cercanos, pasos visibles de la ISS y Tiangong, oscuridad, la Luna y los planetas, y qué merece la pena observar esta noche.",
-            "pl": "Niebo nad Twoją lokalizacją: samoloty w pobliżu, widoczne przeloty ISS i Tiangong, ciemność, Księżyc i planety oraz to, co warto dziś w nocy zobaczyć.",
-            "uk": "Небо над вашим місцем: літаки поблизу, видимі прольоти МКС і Тяньгун, темрява, Місяць і планети та те, на що варто подивитися цієї ночі.",
-            "zh-cn": "您所在位置的天空：附近的飞机、国际空间站和天宫的可见过境、天黑程度、月亮和行星，以及今晚值得一看的天体。"
+            "en": "The sky over your location: aircraft nearby, visible passes of the ISS and Tiangong, darkness, the moon and planets, tonight's sky, whether the aurora can be seen from home, and lightning nearby.",
+            "de": "Der Himmel über Ihrem Standort: Flugzeuge in der Nähe, sichtbare Überflüge von ISS und Tiangong, Dunkelheit, Mond und Planeten, der Himmel heute Nacht, ob Polarlicht von zu Hause aus zu sehen ist, und Blitze in der Nähe.",
+            "ru": "Небо над вашим местом: самолёты поблизости, видимые пролёты МКС и Тяньгун, темнота, Луна и планеты, небо этой ночью, видно ли полярное сияние из дома и молнии поблизости.",
+            "pt": "O céu sobre a sua localização: aviões nas proximidades, passagens visíveis da ISS e da Tiangong, escuridão, a Lua e os planetas, o céu desta noite, se a aurora pode ser vista de casa e relâmpagos por perto.",
+            "nl": "De hemel boven uw locatie: vliegtuigen in de buurt, zichtbare overkomsten van het ISS en Tiangong, duisternis, de maan en planeten, de hemel vannacht, of het poollicht vanuit huis te zien is, en bliksem in de buurt.",
+            "fr": "Le ciel au-dessus de chez vous : avions à proximité, survols visibles de l'ISS et de Tiangong, obscurité, la Lune et les planètes, le ciel de cette nuit, si l'aurore est visible depuis chez vous, et la foudre à proximité.",
+            "it": "Il cielo sopra la tua posizione: aerei nelle vicinanze, passaggi visibili della ISS e di Tiangong, oscurità, la Luna e i pianeti, il cielo di stanotte, se l'aurora è visibile da casa e fulmini nelle vicinanze.",
+            "es": "El cielo sobre tu ubicación: aviones cercanos, pasos visibles de la ISS y Tiangong, oscuridad, la Luna y los planetas, el cielo de esta noche, si la aurora se ve desde casa y rayos cercanos.",
+            "pl": "Niebo nad Twoją lokalizacją: samoloty w pobliżu, widoczne przeloty ISS i Tiangong, ciemność, Księżyc i planety, niebo tej nocy, czy zorza polarna jest widoczna z domu oraz wyładowania w pobliżu.",
+            "uk": "Небо над вашим місцем: літаки поблизу, видимі прольоти МКС і Тяньгун, темрява, Місяць і планети, небо цієї ночі, чи видно полярне сяйво з дому, та блискавки поблизу.",
+            "zh-cn": "您所在位置的天空：附近的飞机、国际空间站和天宫的可见过境、天黑程度、月亮和行星、今晚的天空、在家能否看到极光，以及附近的闪电。"
         },
         "authors": ["Alan Paris <alan.paris@scottish.rugby>"],
-        "keywords": ["sky", "aircraft", "ads-b", "satellites", "iss", "astronomy", "moon", "planets"],
+        "keywords": ["sky", "aircraft", "ads-b", "satellites", "iss", "astronomy", "aurora", "lightning"],
         "licenseInformation": {
             "type": "free",
             "license": "MIT"
@@ -93,7 +93,14 @@
         "backgroundEnabled": false,
         "backgroundRadiusKm": 30,
         "backgroundIntervalS": 60,
-        "overheadElevation": 45
+        "overheadElevation": 45,
+        "auroraEnabled": true,
+        "auroraNowcastInstance": "aurora-nowcast.0",
+        "auroraCloudLimit": 60,
+        "auroraWatchUk": false,
+        "lightningEnabled": false,
+        "lightningRadiusKm": 300,
+        "lightningNearKm": 40
     },
     "objects": [],
     "instanceObjects": [

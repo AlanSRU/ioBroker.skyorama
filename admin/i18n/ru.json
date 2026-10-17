@@ -29,5 +29,21 @@
     "Background interval (seconds)": "Интервал фонового опроса (секунды)",
     "How often the aircraft states are updated": "Как часто обновляются состояния самолётов",
     "Overhead from (degrees above the horizon)": "Над головой от (градусов над горизонтом)",
-    "An aircraft at least this high in the sky counts as overhead": "Самолёт не ниже этой высоты на небе считается находящимся над головой"
+    "An aircraft at least this high in the sky counts as overhead": "Самолёт не ниже этой высоты на небе считается находящимся над головой",
+    "Aurora": "Полярное сияние",
+    "Aurora: can it be seen from home now?": "Полярное сияние: видно ли его сейчас из дома?",
+    "Uses the NOAA aurora forecast and Open-Meteo cloud cover, fetched only while it is getting dark or dark": "Использует прогноз полярных сияний NOAA и облачность Open-Meteo, запрашиваются только в сумерках и ночью",
+    "aurora-nowcast instance for the Kp index": "Экземпляр aurora-nowcast для индекса Kp",
+    "For example aurora-nowcast.0. Leave empty if that adapter is not installed.": "Например, aurora-nowcast.0. Оставьте пустым, если этот адаптер не установлен.",
+    "Cloud cover limit (%)": "Предел облачности (%)",
+    "With more cloud than this the aurora counts as not visible": "При большей облачности сияние считается невидимым",
+    "Use AuroraWatch UK (UK only)": "Использовать AuroraWatch UK (только Великобритания)",
+    "UK-wide alert level from Lancaster University; amber or red counts as near enough": "Общенациональный уровень оповещения Ланкастерского университета; янтарный или красный считается достаточно близким",
+    "Lightning": "Молнии",
+    "Lightning nearby": "Молнии поблизости",
+    "Strikes from the Blitzortung community network (non-commercial use only)": "Разряды из сообщества Blitzortung (только некоммерческое использование)",
+    "Strike radius (km)": "Радиус разрядов (км)",
+    "Strikes within this distance are kept for an hour": "Разряды в пределах этого расстояния хранятся в течение часа",
+    "Near radius (km)": "Ближний радиус (км)",
+    "A strike this close after a quiet half hour raises the lightning alert": "Разряд на таком расстоянии после спокойного получаса вызывает предупреждение о молнии"
 }

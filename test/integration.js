@@ -41,6 +41,8 @@ tests.integration(path.join(__dirname, '..'), {
                         astronomyEnabled: true,
                         aircraftEnabled: true,
                         backgroundEnabled: false,
+                        auroraEnabled: false,
+                        lightningEnabled: false,
                     },
                 });
                 await harness.startAdapterAndWait(true);
