@@ -6,7 +6,7 @@
 import { AircraftLookup, type LookupResult } from './aircraft-lookup';
 import { SourceHealth } from './health';
 import type { Host } from './host';
-import { HttpError, getJson, getText, type JsonFetcher, type TextFetcher } from './http';
+import { backoffMs, getJson, getText, type JsonFetcher, type TextFetcher } from './http';
 import { FT, NM, bearing, compass, fillUrl, metres, num, round, type Location } from './util';
 
 /** One aircraft in an area answer. Units: ft, knots, nm, degrees, ft/min. */
@@ -291,6 +291,9 @@ export class AircraftModule {
     private readonly followed = new Map<string, FollowResult>();
     private followTimer: ioBroker.Timeout | undefined;
     private followRunning = false;
+    /** per lookup source: failures in a row, and not asked again before this time */
+    private readonly lookupFailures: number[];
+    private readonly lookupRetryAt: number[];
     private fiQueue: Promise<void> = Promise.resolve();
     private lastFiAt = 0;
     private emergencyHexes = new Set<string>();
@@ -306,6 +309,8 @@ export class AircraftModule {
                 ? new SourceHealth('Aircraft lookup source', host.log, 'aircraftLookup')
                 : new SourceHealth('Aircraft lookup fallback', host.log, 'aircraftLookup2'),
         );
+        this.lookupFailures = cfg.lookupUrls.map(() => 0);
+        this.lookupRetryAt = cfg.lookupUrls.map(() => 0);
         this.lookups = new AircraftLookup(host.log, deps.getJson, deps.getText, cfg.routeUrl);
     }
 
@@ -476,10 +481,7 @@ export class AircraftModule {
                 return;
             }
             this.areaFailures++;
-            // retry after 2 s, doubling up to a minute; rate limiting (429) waits at least 30 s
-            const backoff = Math.min(60_000, 2_000 * 2 ** (this.areaFailures - 1));
-            const rateLimited = err instanceof HttpError && err.status === 429;
-            this.retryAt = Date.now() + (rateLimited ? Math.max(30_000, backoff) : backoff);
+            this.retryAt = Date.now() + backoffMs(this.areaFailures, err);
             this.area.fail(err);
             await this.host.updateConnection();
             return;
@@ -605,19 +607,23 @@ export class AircraftModule {
 
     /** The primary lookup (at most one request a second), then the fallback. null when none answers. */
     private async fetchFollowed(hex: string): Promise<FollowResult | null> {
-        const sources = this.cfg.lookupUrls.map(
-            (u, i) =>
-                [this.lookupHealth[i], fillUrl(u, { hex }), i === 0 ? 4_000 : 8_000] as [SourceHealth, string, number],
-        );
-        for (const [health, url, timeout] of sources) {
+        for (let i = 0; i < this.cfg.lookupUrls.length; i++) {
+            const health = this.lookupHealth[i];
+            const url = fillUrl(this.cfg.lookupUrls[i], { hex });
+            const timeout = i === 0 ? 4_000 : 8_000;
+            if (Date.now() < this.lookupRetryAt[i]) {
+                continue; // failed lately (or rate limited): left alone for now
+            }
             try {
-                if (health === this.lookupHealth[0]) {
+                if (i === 0) {
                     await this.lookupSlot();
                 }
                 const data = await this.deps.getJson(url, timeout, this.headersFor(url));
                 if (this.host.stopped()) {
                     return null;
                 }
+                this.lookupFailures[i] = 0;
+                this.lookupRetryAt[i] = 0;
                 health.ok();
                 await this.host.updateConnection();
                 const a = rawList(data)
@@ -628,6 +634,8 @@ export class AircraftModule {
                 if (this.host.stopped()) {
                     return null;
                 }
+                this.lookupFailures[i]++;
+                this.lookupRetryAt[i] = Date.now() + backoffMs(this.lookupFailures[i], err);
                 health.fail(err);
                 await this.host.updateConnection();
             }

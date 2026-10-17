@@ -11,7 +11,7 @@ import {
     type AircraftConfig,
 } from './aircraft';
 import type { Host } from './host';
-import { HttpError } from './http';
+import { HttpError, backoffMs, retryAfterOf } from './http';
 import { NM, urlSettingOf, type Location } from './util';
 
 const HOME: Location = { lat: 55.95, lon: -3.19, height: 0 };
@@ -187,6 +187,44 @@ function harness(
     return { mod, urls, delays, writes, notes, respond: fn => (handler = fn) };
 }
 
+describe('aircraft: backoff', () => {
+    it('waits at least a minute after a 429, doubling up to 30 minutes, and honours Retry-After', () => {
+        expect(backoffMs(1, new HttpError(429))).to.equal(60_000);
+        expect(backoffMs(3, new HttpError(429))).to.equal(240_000);
+        expect(backoffMs(20, new HttpError(429))).to.equal(30 * 60_000);
+        expect(backoffMs(1, new HttpError(429, 600_000))).to.equal(600_000);
+    });
+
+    it('backs off other failures from 2 s up to 5 minutes', () => {
+        expect(backoffMs(1, new Error('connect ETIMEDOUT'))).to.equal(2_000);
+        expect(backoffMs(4, new HttpError(503))).to.equal(16_000);
+        expect(backoffMs(30, new Error('x'))).to.equal(5 * 60_000);
+    });
+
+    it('reads Retry-After as seconds or as a date', () => {
+        const now = Date.UTC(2026, 9, 17, 12);
+        expect(retryAfterOf('120', now)).to.equal(120_000);
+        expect(retryAfterOf(new Date(now + 90_000).toUTCString(), now)).to.equal(90_000);
+        expect(retryAfterOf(null, now)).to.equal(null);
+        expect(retryAfterOf('soon', now)).to.equal(null);
+    });
+
+    it('leaves a failing lookup source (and its fallback) alone during the backoff', async () => {
+        const h = harness();
+        h.respond(() => new HttpError(429));
+        const fetchFollowed = (
+            h.mod as unknown as { fetchFollowed: (hex: string) => Promise<unknown> }
+        ).fetchFollowed.bind(h.mod);
+        await fetchFollowed('aaaaa1');
+        expect(h.urls).to.have.length(2); // the lookup, then the fallback
+        for (let i = 0; i < 5; i++) {
+            await fetchFollowed('aaaaa1');
+        }
+        expect(h.urls).to.have.length(2);
+        h.mod.stop();
+    });
+});
+
 describe('aircraft: polling model', () => {
     it('serves concurrent requests with one fetch each, widening the radius, and trims per request', async () => {
         const h = harness();
@@ -223,7 +261,7 @@ describe('aircraft: polling model', () => {
         for (let i = 0; i < 5; i++) {
             await h.mod.aircraft(10);
         }
-        expect(h.urls).to.have.length(2); // 429: at least 30 s before the next request
+        expect(h.urls).to.have.length(2); // 429: at least a minute before the next request
         h.mod.stop();
     });
 

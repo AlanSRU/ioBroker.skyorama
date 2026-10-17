@@ -4,11 +4,40 @@ import { version } from '../../package.json';
 
 export const USER_AGENT = `ioBroker.skyorama/${version} (+https://github.com/AlanSRU/ioBroker.skyorama)`;
 
-/** A non-2xx answer. */
+/** A non-2xx answer; `retryAfterMs` from a Retry-After header (seconds or a date), if any. */
 export class HttpError extends Error {
-    public constructor(public readonly status: number) {
+    public constructor(
+        public readonly status: number,
+        public readonly retryAfterMs: number | null = null,
+    ) {
         super(`HTTP ${status}`);
     }
+}
+
+/** Retry-After as milliseconds from now (seconds or an HTTP date), or null. */
+export function retryAfterOf(header: string | null, now = Date.now()): number | null {
+    if (!header) {
+        return null;
+    }
+    const s = Number(header);
+    if (Number.isFinite(s) && s >= 0) {
+        return s * 1000;
+    }
+    const t = Date.parse(header);
+    return Number.isFinite(t) ? Math.max(0, t - now) : null;
+}
+
+/**
+ * How long to leave a source alone after its `failures`-th failure in a row. Rate limited (429): Retry-After, but at
+ * least a minute, doubling up to 30 minutes. Anything else (timeouts, refused connections, errors): 2 s, doubling up
+ * to 5 minutes, so a source that has stopped answering is not asked over and over.
+ */
+export function backoffMs(failures: number, err: unknown): number {
+    const n = Math.max(1, failures);
+    if (err instanceof HttpError && err.status === 429) {
+        return Math.min(30 * 60_000, Math.max(err.retryAfterMs ?? 0, 60_000 * 2 ** Math.min(n - 1, 10)));
+    }
+    return Math.min(5 * 60_000, 2_000 * 2 ** Math.min(n - 1, 10));
 }
 
 async function get(url: string, timeoutMs: number, headers: Record<string, string> = {}): Promise<Response> {
@@ -19,7 +48,7 @@ async function get(url: string, timeoutMs: number, headers: Record<string, strin
         signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok && res.status !== 404) {
-        throw new HttpError(res.status);
+        throw new HttpError(res.status, retryAfterOf(res.headers.get('retry-after')));
     }
     return res;
 }

@@ -200,7 +200,9 @@ gentle request rates. Skyorama keeps its own rate low:
 - nothing is polled unless something needs it, either a front-end asking through `sendTo`, or the optional background
   polling for the `aircraft.*` states;
 - a front-end asking gets fresh data every 10 seconds at most, for the widest radius asked for in the last minute;
-- a source that fails is left alone for a while before it is asked again.
+- a source that fails is left alone before it is asked again: from 2 seconds, doubling up to 5 minutes, and after a
+  rate limit (HTTP 429) at least a minute, doubling up to 30 minutes (longer if the service asks for it with
+  Retry-After). This applies to the area source and to each lookup source.
 
 Details for one aircraft are loaded only when asked for and cached (routes 1 day, photos 7 days):
 
@@ -501,6 +503,7 @@ the log has the reason.
 * (Alan Paris) Choose up to 20 satellites for passes and alerts (ISS and Tiangong by default)
 * (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event
 * (Alan Paris) Meteor showers, eclipses seen from home, moon and planet events, stargazing cloud forecast, and an "upcoming" page (www)
+* (Alan Paris) Aircraft sources back off much longer after failures and rate limiting (honouring Retry-After)
 
 ### 0.0.1 (2026-10-17)
 * (Alan Paris) initial release
