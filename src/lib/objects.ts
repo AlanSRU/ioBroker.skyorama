@@ -1,0 +1,109 @@
+// Every object the adapter creates, per module. Kept in one place so a unit test can check the tree.
+
+import { DARKNESS_LABELS, PLANETS } from './astronomy';
+import { STATIONS } from './satellites';
+
+export interface ObjectDef {
+    id: string;
+    obj: ioBroker.SettableObject;
+}
+
+type StateCommon = Partial<ioBroker.StateCommon>;
+
+function channel(id: string, name: string): ObjectDef {
+    return { id, obj: { type: 'channel', common: { name }, native: {} } };
+}
+
+function state(id: string, common: StateCommon & { name: string; type: ioBroker.CommonType; role: string }): ObjectDef {
+    return { id, obj: { type: 'state', common: { read: true, write: false, ...common }, native: {} } };
+}
+
+const json = (id: string, name: string, def: string): ObjectDef =>
+    state(id, { name, type: 'string', role: 'json', def });
+const text = (id: string, name: string): ObjectDef => state(id, { name, type: 'string', role: 'text', def: '' });
+const flag = (id: string, name: string): ObjectDef =>
+    state(id, { name, type: 'boolean', role: 'indicator', def: false });
+const time = (id: string, name: string, role = 'date'): ObjectDef => state(id, { name, type: 'number', role });
+const degrees = (id: string, name: string, min: number, max: number): ObjectDef =>
+    state(id, { name, type: 'number', role: 'value', unit: '°', min, max });
+
+export function infoObjects(satellites: boolean): ObjectDef[] {
+    return satellites
+        ? [
+              state('info.celestrak', {
+                  name: 'CelesTrak reachable',
+                  type: 'boolean',
+                  role: 'indicator.reachable',
+                  def: false,
+              }),
+          ]
+        : [];
+}
+
+export function satelliteObjects(): ObjectDef[] {
+    const out: ObjectDef[] = [
+        channel('satellites', 'Satellites'),
+        json('satellites.tle', 'Orbit set from CelesTrak (JSON)', '{"sats":[]}'),
+        text('satellites.alert', 'Space station pass alert'),
+    ];
+    for (const [key, st] of Object.entries(STATIONS)) {
+        const id = `satellites.${key}`;
+        out.push(
+            channel(id, st.name),
+            flag(`${id}.visibleNow`, `${st.name} visible now`),
+            json(`${id}.passes`, `${st.name} visible passes, next 72 h (JSON)`, '{"passes":[]}'),
+            channel(`${id}.next`, `${st.name} next visible pass`),
+            time(`${id}.next.start`, 'Comes into view', 'date.start'),
+            time(`${id}.next.end`, 'Goes out of view', 'date.end'),
+            degrees(`${id}.next.maxEl`, 'Highest elevation', 0, 90),
+            time(`${id}.next.maxAt`, 'Highest at'),
+            degrees(`${id}.next.fromAz`, 'Comes into view at azimuth', 0, 360),
+            degrees(`${id}.next.toAz`, 'Goes out of view at azimuth', 0, 360),
+            text(`${id}.next.text`, 'Description'),
+        );
+    }
+    return out;
+}
+
+export function astronomyObjects(): ObjectDef[] {
+    const out: ObjectDef[] = [
+        channel('astronomy', 'Astronomy'),
+        state('astronomy.darkness', {
+            name: 'Darkness',
+            type: 'string',
+            role: 'text',
+            def: 'day',
+            states: { ...DARKNESS_LABELS },
+        }),
+        json('astronomy.tonight', "Tonight's sky (JSON)", '{}'),
+        text('astronomy.tonightText', "Tonight's sky"),
+        channel('astronomy.moon', 'Moon'),
+        text('astronomy.moon.phase', 'Phase'),
+        state('astronomy.moon.illumination', {
+            name: 'Illuminated',
+            type: 'number',
+            role: 'value',
+            unit: '%',
+            min: 0,
+            max: 100,
+        }),
+        degrees('astronomy.moon.elevation', 'Elevation', -90, 90),
+        time('astronomy.moon.rise', 'Next moonrise'),
+        time('astronomy.moon.set', 'Next moonset'),
+        channel('astronomy.planets', 'Planets'),
+    ];
+    for (const key of Object.keys(PLANETS)) {
+        const id = `astronomy.planets.${key}`;
+        const name = key.charAt(0).toUpperCase() + key.slice(1);
+        out.push(
+            channel(id, name),
+            flag(`${id}.visible`, `${name} visible now`),
+            degrees(`${id}.elevation`, 'Elevation', -90, 90),
+            degrees(`${id}.azimuth`, 'Azimuth', 0, 360),
+            time(`${id}.rise`, 'Next rise'),
+            time(`${id}.set`, 'Next set'),
+            state(`${id}.magnitude`, { name: 'Magnitude', type: 'number', role: 'value' }),
+        );
+    }
+    return out;
+}

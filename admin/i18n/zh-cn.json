@@ -1,0 +1,20 @@
+{
+    "Additional CelesTrak groups": "其他 CelesTrak 组",
+    "Alert this many minutes before a visible flyover": "在可见过境前多少分钟发出提醒",
+    "Astronomy": "天文学",
+    "Calculated locally, no internet access": "本地计算，无需联网",
+    "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.": "提供给前端的轨道集所用的 CelesTrak 组名，以逗号分隔（默认：visual，最亮的卫星）。空间站始终包含在内。",
+    "Degrees, east positive": "度数，东正",
+    "Degrees, north positive": "度数，北正",
+    "Latitude": "纬度",
+    "Location": "地点",
+    "Longitude": "经度",
+    "Minimum flyover height for an alert (degrees above the horizon)": "发出提醒的最低过境高度（地平线以上度数）",
+    "No alert for flyovers that stay lower than this": "过境高度低于此值时不提醒",
+    "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong": "来自 CelesTrak 的轨道，每天最多两次；国际空间站和天宫的可见过境",
+    "Satellites": "卫星",
+    "Sun, moon, planets and tonight's sky": "太阳、月亮、行星和今晚的天空",
+    "The alert is written this long before the space station comes into view": "在空间站进入视野前这么长时间写入提醒",
+    "Track satellites": "跟踪卫星",
+    "Use the latitude and longitude from the system settings": "使用系统设置中的纬度和经度"
+}

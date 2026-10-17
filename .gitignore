@@ -1,0 +1,26 @@
+# No dot-directories except github/vscode
+.*/
+!.vscode/
+!.github/
+
+*.code-workspace
+node_modules
+nbproject
+
+# npm package files
+iobroker.*.tgz
+
+Thumbs.db
+.commitinfo
+
+# i18n intermediate files
+admin/i18n/flat.txt
+admin/i18n/*/flat.txt
+# Local-only dev notes and review marker
+CLAUDE.md
+**/CLAUDE.md
+.review/
+PLAN.md
+
+# Compiled output (published to npm, not committed)
+build/

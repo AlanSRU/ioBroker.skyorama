@@ -1,0 +1,20 @@
+{
+    "Additional CelesTrak groups": "Додаткові групи CelesTrak",
+    "Alert this many minutes before a visible flyover": "Попереджати за стільки хвилин до видимого прольоту",
+    "Astronomy": "Астрономія",
+    "Calculated locally, no internet access": "Розрахунок локальний, немає доступу до інтернету",
+    "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.": "Назви груп CelesTrak через кому для набору орбіт, що передається інтерфейсам (типово: visual, найяскравіші супутники). Космічні станції включені завжди.",
+    "Degrees, east positive": "Градус, східний плюс",
+    "Degrees, north positive": "Градуси, північ позитивний",
+    "Latitude": "Широта",
+    "Location": "Розташування",
+    "Longitude": "Довгота",
+    "Minimum flyover height for an alert (degrees above the horizon)": "Мінімальна висота прольоту для попередження (градуси над горизонтом)",
+    "No alert for flyovers that stay lower than this": "Без попередження для прольотів, що залишаються нижче",
+    "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong": "Орбіти від CelesTrak, не частіше двох разів на день; видимі прольоти МКС і Тяньгун",
+    "Satellites": "Супутники",
+    "Sun, moon, planets and tonight's sky": "Сонце, місяць, планети та сьогоднішнє небо",
+    "The alert is written this long before the space station comes into view": "Попередження записується за цей час до появи космічної станції",
+    "Track satellites": "Відстеження супутників",
+    "Use the latitude and longitude from the system settings": "Використовуйте широту та довготу в налаштуваннях системи"
+}

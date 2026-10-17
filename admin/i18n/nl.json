@@ -1,0 +1,20 @@
+{
+    "Additional CelesTrak groups": "Extra CelesTrak-groepen",
+    "Alert this many minutes before a visible flyover": "Waarschuw zoveel minuten vóór een zichtbare overkomst",
+    "Astronomy": "Astronomie",
+    "Calculated locally, no internet access": "Lokaal berekend, geen internettoegang",
+    "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.": "Door komma's gescheiden CelesTrak-groepsnamen voor de baangegevens die aan weergaven worden gegeven (standaard: visual, de helderste satellieten). De ruimtestations zijn altijd inbegrepen.",
+    "Degrees, east positive": "Graden, oost positief",
+    "Degrees, north positive": "Graden, noord positief",
+    "Latitude": "Breedtegraad",
+    "Location": "Locatie",
+    "Longitude": "Lengtegraad",
+    "Minimum flyover height for an alert (degrees above the horizon)": "Minimale hoogte van de overkomst voor een waarschuwing (graden boven de horizon)",
+    "No alert for flyovers that stay lower than this": "Geen waarschuwing voor overkomsten die lager blijven",
+    "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong": "Baangegevens van CelesTrak, hoogstens twee keer per dag; zichtbare overkomsten van het ISS en Tiangong",
+    "Satellites": "Satellieten",
+    "Sun, moon, planets and tonight's sky": "Zon, maan, planeten en de hemel van vanavond",
+    "The alert is written this long before the space station comes into view": "De waarschuwing wordt zo lang geschreven voordat het ruimtestation zichtbaar wordt",
+    "Track satellites": "Volg satellieten",
+    "Use the latitude and longitude from the system settings": "Gebruik de breedte- en lengtegraad uit de systeeminstellingen"
+}

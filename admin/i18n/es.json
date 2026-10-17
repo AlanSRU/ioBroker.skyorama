@@ -1,0 +1,20 @@
+{
+    "Additional CelesTrak groups": "Grupos adicionales de CelesTrak",
+    "Alert this many minutes before a visible flyover": "Avisar estos minutos antes de un paso visible",
+    "Astronomy": "Astronomía",
+    "Calculated locally, no internet access": "Calculado localmente, sin acceso a Internet.",
+    "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.": "Nombres de grupos de CelesTrak separados por comas para el conjunto de órbitas que reciben las interfaces (por defecto: visual, los satélites más brillantes). Las estaciones espaciales siempre se incluyen.",
+    "Degrees, east positive": "Grados, este positivo",
+    "Degrees, north positive": "Grados, norte positivo",
+    "Latitude": "Latitud",
+    "Location": "Ubicación",
+    "Longitude": "Longitud",
+    "Minimum flyover height for an alert (degrees above the horizon)": "Altura mínima del paso para una alerta (grados sobre el horizonte)",
+    "No alert for flyovers that stay lower than this": "Sin alerta para pasos que se quedan más bajos",
+    "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong": "Órbitas de CelesTrak, como máximo dos veces al día; pasos visibles de la ISS y Tiangong",
+    "Satellites": "Satélites",
+    "Sun, moon, planets and tonight's sky": "Sol, luna, planetas y el cielo de esta noche.",
+    "The alert is written this long before the space station comes into view": "La alerta se escribe con esta antelación antes de que la estación espacial sea visible",
+    "Track satellites": "Seguimiento de satélites",
+    "Use the latitude and longitude from the system settings": "Utilice la latitud y longitud desde la configuración del sistema"
+}

@@ -1,0 +1,124 @@
+{
+    "i18n": true,
+    "type": "tabs",
+    "items": {
+        "locationTab": {
+            "type": "panel",
+            "label": "Location",
+            "items": {
+                "useSystemLocation": {
+                    "type": "checkbox",
+                    "label": "Use the latitude and longitude from the system settings",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "latitude": {
+                    "type": "number",
+                    "label": "Latitude",
+                    "help": "Degrees, north positive",
+                    "min": -90,
+                    "max": 90,
+                    "step": 0.0001,
+                    "hidden": "data.useSystemLocation",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "longitude": {
+                    "type": "number",
+                    "label": "Longitude",
+                    "help": "Degrees, east positive",
+                    "min": -180,
+                    "max": 180,
+                    "step": 0.0001,
+                    "hidden": "data.useSystemLocation",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
+        },
+        "satellitesTab": {
+            "type": "panel",
+            "label": "Satellites",
+            "items": {
+                "satellitesEnabled": {
+                    "type": "checkbox",
+                    "label": "Track satellites",
+                    "help": "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                },
+                "satelliteGroups": {
+                    "type": "text",
+                    "label": "Additional CelesTrak groups",
+                    "help": "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.",
+                    "disabled": "!data.satellitesEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "passAlertLeadMin": {
+                    "type": "number",
+                    "label": "Alert this many minutes before a visible flyover",
+                    "help": "The alert is written this long before the space station comes into view",
+                    "min": 1,
+                    "max": 120,
+                    "disabled": "!data.satellitesEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "passAlertMinEl": {
+                    "type": "number",
+                    "label": "Minimum flyover height for an alert (degrees above the horizon)",
+                    "help": "No alert for flyovers that stay lower than this",
+                    "min": 0,
+                    "max": 90,
+                    "disabled": "!data.satellitesEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                }
+            }
+        },
+        "astronomyTab": {
+            "type": "panel",
+            "label": "Astronomy",
+            "items": {
+                "astronomyEnabled": {
+                    "type": "checkbox",
+                    "label": "Sun, moon, planets and tonight's sky",
+                    "help": "Calculated locally, no internet access",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
+                }
+            }
+        }
+    }
+}

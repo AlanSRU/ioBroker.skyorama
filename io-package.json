@@ -1,0 +1,116 @@
+{
+    "common": {
+        "name": "skyorama",
+        "version": "0.0.1",
+        "news": {
+            "0.0.1": {
+                "en": "initial release",
+                "de": "Erstveröffentlichung",
+                "ru": "Начальная версия",
+                "pt": "lançamento inicial",
+                "nl": "Eerste uitgave",
+                "fr": "Première version",
+                "it": "Versione iniziale",
+                "es": "Versión inicial",
+                "pl": "Pierwsze wydanie",
+                "uk": "Початкова версія",
+                "zh-cn": "首次出版"
+            }
+        },
+        "titleLang": {
+            "en": "Skyorama",
+            "de": "Skyorama",
+            "ru": "Скайорама",
+            "pt": "Skyorama",
+            "nl": "Skyorama",
+            "fr": "Skyorama",
+            "it": "Skyorama",
+            "es": "Skyorama",
+            "pl": "Skyorama",
+            "uk": "Skyorama",
+            "zh-cn": "斯凯奥拉玛"
+        },
+        "desc": {
+            "en": "The sky over your location: visible passes of the ISS and Tiangong, darkness, the moon and planets, and what is worth looking at tonight.",
+            "de": "Der Himmel über Ihrem Standort: sichtbare Überflüge von ISS und Tiangong, Dunkelheit, Mond und Planeten und was heute Nacht sehenswert ist.",
+            "ru": "Небо над вашим местом: видимые пролёты МКС и Тяньгун, темнота, Луна и планеты и то, на что стоит посмотреть этой ночью.",
+            "pt": "O céu sobre a sua localização: passagens visíveis da ISS e da Tiangong, escuridão, a Lua e os planetas e o que vale a pena observar esta noite.",
+            "nl": "De hemel boven uw locatie: zichtbare overkomsten van het ISS en Tiangong, duisternis, de maan en planeten, en wat vannacht de moeite waard is.",
+            "fr": "Le ciel au-dessus de chez vous : survols visibles de l'ISS et de Tiangong, obscurité, la Lune et les planètes, et ce qui vaut la peine d'être observé cette nuit.",
+            "it": "Il cielo sopra la tua posizione: passaggi visibili della ISS e di Tiangong, oscurità, la Luna e i pianeti e cosa vale la pena osservare stanotte.",
+            "es": "El cielo sobre tu ubicación: pasos visibles de la ISS y Tiangong, oscuridad, la Luna y los planetas, y qué merece la pena observar esta noche.",
+            "pl": "Niebo nad Twoją lokalizacją: widoczne przeloty ISS i Tiangong, ciemność, Księżyc i planety oraz to, co warto dziś w nocy zobaczyć.",
+            "uk": "Небо над вашим місцем: видимі прольоти МКС і Тяньгун, темрява, Місяць і планети та те, на що варто подивитися цієї ночі.",
+            "zh-cn": "您所在位置的天空：国际空间站和天宫的可见过境、天黑程度、月亮和行星，以及今晚值得一看的天体。"
+        },
+        "authors": ["Alan Paris <alan.paris@scottish.rugby>"],
+        "keywords": ["sky", "satellites", "iss", "astronomy", "moon", "planets"],
+        "licenseInformation": {
+            "type": "free",
+            "license": "MIT"
+        },
+        "platform": "Javascript/Node.js",
+        "icon": "skyorama.png",
+        "enabled": true,
+        "extIcon": "https://raw.githubusercontent.com/AlanSRU/ioBroker.skyorama/main/admin/skyorama.png",
+        "readme": "https://github.com/AlanSRU/ioBroker.skyorama/blob/main/README.md",
+        "loglevel": "info",
+        "tier": 3,
+        "mode": "daemon",
+        "type": "misc-data",
+        "compact": true,
+        "connectionType": "cloud",
+        "dataSource": "poll",
+        "adminUI": {
+            "config": "json"
+        },
+        "dependencies": [
+            {
+                "js-controller": ">=6.0.11"
+            }
+        ],
+        "globalDependencies": [
+            {
+                "admin": ">=7.6.20"
+            }
+        ],
+        "supportedMessages": {
+            "custom": true
+        },
+        "nogit": true
+    },
+    "native": {
+        "useSystemLocation": true,
+        "latitude": 0,
+        "longitude": 0,
+        "satellitesEnabled": true,
+        "satelliteGroups": "visual",
+        "passAlertLeadMin": 10,
+        "passAlertMinEl": 20,
+        "astronomyEnabled": true
+    },
+    "objects": [],
+    "instanceObjects": [
+        {
+            "_id": "info",
+            "type": "channel",
+            "common": {
+                "name": "Information"
+            },
+            "native": {}
+        },
+        {
+            "_id": "info.connection",
+            "type": "state",
+            "common": {
+                "role": "indicator.connected",
+                "name": "Device or service connected",
+                "type": "boolean",
+                "read": true,
+                "write": false,
+                "def": false
+            },
+            "native": {}
+        }
+    ]
+}

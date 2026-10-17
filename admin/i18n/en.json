@@ -1,0 +1,20 @@
+{
+    "Location": "Location",
+    "Use the latitude and longitude from the system settings": "Use the latitude and longitude from the system settings",
+    "Latitude": "Latitude",
+    "Degrees, north positive": "Degrees, north positive",
+    "Longitude": "Longitude",
+    "Degrees, east positive": "Degrees, east positive",
+    "Satellites": "Satellites",
+    "Track satellites": "Track satellites",
+    "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong": "Orbits from CelesTrak, at most twice a day; visible flyovers of the ISS and Tiangong",
+    "Additional CelesTrak groups": "Additional CelesTrak groups",
+    "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.": "Comma-separated CelesTrak group names for the orbit set given to front-ends (default: visual, the brightest satellites). The space stations are always included.",
+    "Alert this many minutes before a visible flyover": "Alert this many minutes before a visible flyover",
+    "The alert is written this long before the space station comes into view": "The alert is written this long before the space station comes into view",
+    "Minimum flyover height for an alert (degrees above the horizon)": "Minimum flyover height for an alert (degrees above the horizon)",
+    "No alert for flyovers that stay lower than this": "No alert for flyovers that stay lower than this",
+    "Astronomy": "Astronomy",
+    "Sun, moon, planets and tonight's sky": "Sun, moon, planets and tonight's sky",
+    "Calculated locally, no internet access": "Calculated locally, no internet access"
+}
