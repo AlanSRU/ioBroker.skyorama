@@ -190,7 +190,7 @@
 
     /** Where an aircraft will be `dt` seconds later (speed, track and climb held). */
     function ahead(a, dt) {
-        if (!a.gs || a.track == null || !a.alt || a.stale) {
+        if (!a.gs || a.track == null || !(a.alt > 0) || a.stale) {
             return { lat: a.lat, lon: a.lon, alt: a.alt || 0 };
         }
         const d = (a.gs * 1852 * dt) / 3600 / EARTH_R;
@@ -266,6 +266,23 @@
                 this.heading = h;
                 this.bgFor = null; // the slow layer is redrawn for the new direction
             }
+        }
+
+        /**
+         * What was drawn nearest to a point on the canvas (CSS pixels, relative to the canvas), within `max` pixels:
+         * `{ kind: 'aircraft' | 'satellite', item }`, or null.
+         */
+        hitAt(x, y, max) {
+            let best = null;
+            let bestD = (max || 18) ** 2;
+            for (const h of this.hits || []) {
+                const d = (h.x - x) ** 2 + (h.y - y) ** 2;
+                if (d < bestD) {
+                    best = h;
+                    bestD = d;
+                }
+            }
+            return best && { kind: best.kind, item: best.item };
         }
 
         /** The answer of `sendTo('skyorama.N', 'sky')`. */
@@ -578,6 +595,7 @@
             c.beginPath();
             c.arc(this.size / 2, this.size / 2, this.radius(), 0, Math.PI * 2);
             c.clip();
+            this.hits = [];
             this.drawSatellites(c, t);
             this.drawAircraft(c, t);
             c.restore();
@@ -598,6 +616,7 @@
                     continue;
                 }
                 const [x, y] = this.xy(az, el);
+                this.hits.push({ kind: 'satellite', item: Object.assign({}, o, { az, el }), x, y });
                 c.fillStyle = o.visible ? (o.tracked ? '#ffe08a' : '#ffffff') : 'rgba(210, 220, 235, .45)';
                 c.beginPath();
                 c.arc(x, y, o.tracked ? 3.5 : 2.3, 0, Math.PI * 2);
@@ -625,7 +644,7 @@
             const home = this.sky.home;
             const dt = Math.min(60, Math.max(0, (t - this.aircraftReceived) / 1000));
             for (const p of a.ac) {
-                if (!p.alt) {
+                if (!(p.alt > 0)) {
                     continue; // on the ground (or unknown height)
                 }
                 const now = ahead(p, dt);
@@ -636,6 +655,7 @@
                 const next = ahead(p, dt + 60);
                 const na = lookAt(home, next.lat, next.lon, next.alt * FT);
                 const [x, y] = this.xy(at.az, at.el);
+                this.hits.push({ kind: 'aircraft', item: Object.assign({}, p, now), x, y });
                 const [nx, ny] = this.xy(na.az, Math.max(0, na.el));
                 const col = altColour(p);
                 c.strokeStyle = col;

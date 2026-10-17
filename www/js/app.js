@@ -1,16 +1,21 @@
 /*
  * The dome page: connects to ioBroker through the web adapter's socket, asks Skyorama for the sky (and aircraft, if
  * an aircraft source is configured) every 10 s, and draws the dome about ten times a second.
- * URL parameters: ?instance=0 (Skyorama instance), ?radius=30 (aircraft radius in nautical miles),
+ * URL parameters: ?instance=0 (Skyorama instance), ?units=km|mi|nm, ?radius=50 (aircraft radius in those units),
  * ?heading=90 (a fixed direction at the top, e.g. for a wall screen facing east), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (the next 22:00) or ?at=2026-10-24T22:00
  * (another time, within a week; live aircraft are left out then).
  */
 (function () {
     'use strict';
 
-    const params = new URLSearchParams(location.search);
-    const instance = `skyorama.${/^\d{1,3}$/.test(params.get('instance') || '') ? params.get('instance') : '0'}`;
-    const radiusNm = Math.min(250, Math.max(1, Number(params.get('radius')) || 30));
+    const P = window.SkyoramaPage;
+    const params = P.params;
+    const instance = P.instance;
+    // ?radius in the chosen units (as on the map); default about 50 km
+    const radiusNm = Math.min(
+        250,
+        Math.max(1, P.fmt.toNm(Number(params.get('radius')) || (P.units === 'km' ? 50 : 30))),
+    );
     /** ?at=22:00 (the next 22:00) or a date and time; limited to a week, as the adapter does */
     function shownAt(text) {
         if (!text) {
@@ -37,28 +42,31 @@
     const FRAME_MS = 100;
 
     const canvas = document.getElementById('dome');
-    const status = document.getElementById('status');
     const clock = document.getElementById('clock');
     const dome = new window.SkyoramaDome(canvas, {
         figures: params.get('figures') !== '0',
         labels: params.get('labels') !== '0',
     });
 
-    const show = text => {
-        status.textContent = text || '';
-        status.hidden = !text;
-    };
+    // for embedding and debugging: the dome object of this page
+    window.skyoramaDome = dome;
+    const show = P.status;
+    const socket = P.socket;
+    const sendTo = P.sendTo;
 
-    // The web adapter serves the socket at /socket.io next to this page.
-    const socket = window.io(location.origin, { path: '/socket.io', transports: ['websocket', 'polling'] });
-    const sendTo = (command, message) =>
-        new Promise(resolve => {
-            const timer = setTimeout(() => resolve({ error: 'No answer from the adapter' }), 15_000);
-            socket.emit('sendTo', instance, command, message, answer => {
-                clearTimeout(timer);
-                resolve(answer || { error: 'No answer from the adapter' });
-            });
-        });
+    // Tap or click an aircraft or satellite for its details.
+    const info = new window.SkyoramaInfo();
+    canvas.addEventListener('click', e => {
+        const r = canvas.getBoundingClientRect();
+        const hit = dome.hitAt(e.clientX - r.left, e.clientY - r.top, 20);
+        if (!hit) {
+            info.close();
+        } else if (hit.kind === 'aircraft') {
+            info.showAircraft(hit.item);
+        } else {
+            info.showSatellite(hit.item);
+        }
+    });
 
     let aircraftOn = true;
     async function poll() {
@@ -83,10 +91,13 @@
             }
             // positions are as old as the adapter's last area answer: move them on from then
             dome.setAircraft(air.error ? null : air, air.error ? undefined : air.at - skew);
+            if (!air.error) {
+                info.update(air.ac);
+            }
         }
     }
 
-    socket.on('connect', () => void poll());
+    P.whenConnected(() => void poll());
     socket.on('disconnect', () => show('Connection to ioBroker lost, reconnecting…'));
     // A fixed direction at the top (wall screens), used whenever the compass is off.
     const fixedHeading = Number.isFinite(Number(params.get('heading'))) ? Number(params.get('heading')) : 0;

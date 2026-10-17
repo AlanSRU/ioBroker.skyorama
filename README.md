@@ -93,12 +93,16 @@ of tonight's sky: when it is dark, which planets are up, the moon, satellite pas
 that are well placed (for example the Andromeda Galaxy, the Pleiades or the Orion Nebula; in the southern hemisphere
 also Omega Centauri and the Magellanic Clouds).
 
-### Visualisation: the sky dome
+### Visualisation: the sky dome and the flight map
 
-An optional page that shows the sky above home as a dome (zenith in the middle, horizon at the edge, north at the
-top). Switch it on in the **Visualisation** tab; the [web adapter](https://github.com/ioBroker/ioBroker.web) then
-serves it at `/skyorama/dome.html`, for example `http://<ioBroker>:8082/skyorama/dome.html`. While it is off, the page
-says so.
+Two optional pages, switched on in the **Visualisation** tab and served by the
+[web adapter](https://github.com/ioBroker/ioBroker.web) at `/skyorama/dome.html` and `/skyorama/map.html` (for example
+`http://<ioBroker>:8082/skyorama/map.html`; `/skyorama/` links to both). While the visualisation is off, the pages say
+so. Tap or click an aircraft on either page for its details: what it is doing, its airline and a photo (with the
+photographer's credit), and its route if a route lookup is configured; it keeps updating while the box is open. Tracked
+satellites show their next visible pass. `?units=km`, `mi` or `nm` sets the distance unit on both pages (default km).
+
+**The sky dome** shows the sky above home (zenith in the middle, horizon at the edge, north at the top).
 
 - The sky's colour follows the sun at your location: light blue by day, through sunset and twilight, to black at
   night.
@@ -114,6 +118,12 @@ says so.
   `?labels=0` (no names), `?at=22:00` (another time, within a week), `?instance=1`.
 - The drawing code (`www/js/dome.js`) has no dependencies, so it can be embedded elsewhere, e.g. in an iframe on a
   dashboard.
+
+**The flight map** shows the aircraft around home with their recent tracks, a one-minute heading line, altitude
+colours, emergencies in red and lost contacts greyed, a choice of range, and (with the lightning module on) the strikes
+of the last hour. Map tiles are optional: enter a tile server URL with `{z}`, `{x}` and `{y}` and the attribution its
+provider requires (respect the provider's usage policy); without one the map shows range rings on a dark background.
+The map uses [Leaflet](https://leafletjs.com/) (BSD-2-Clause, included in `www/lib/leaflet`).
 
 Star positions: Yale Bright Star Catalogue (5th ed.), as converted by
 [brettonw/YaleBrightStarCatalog](https://github.com/brettonw/YaleBrightStarCatalog) (MIT, Bretton Wade); constellation
@@ -201,7 +211,7 @@ sendTo('skyorama.0', 'aircraft', { radiusNm: 20 }, result => {
 
 ### Roadmap
 
-A flight-map visualisation, and a VIS-2 widget for the dome.
+VIS-2 widgets for the dome and the map.
 
 ## Changelog
 <!--
@@ -214,6 +224,7 @@ A flight-map visualisation, and a VIS-2 widget for the dome.
 * (Alan Paris) Aircraft: nearby aircraft, following one aircraft and aircraft details for front-ends, optional background states
 * (Alan Paris) Aurora (visible from home now?) and lightning nearby (Blitzortung)
 * (Alan Paris) Optional sky dome page (www): the sky above home as you would see it, with aircraft and satellites
+* (Alan Paris) Optional flight map page (www), and details for an aircraft or satellite on both pages
 * (Alan Paris) Aircraft and lightning sources are configured by the user (URLs, optional API header, broker login); none built in
 * (Alan Paris) Choose up to 20 satellites for passes and alerts (ISS and Tiangong by default)
 * (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event

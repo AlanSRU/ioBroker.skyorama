@@ -78,7 +78,11 @@
     "Send a test notification": "Send a test notification",
     "Uses the saved settings: save first": "Uses the saved settings: save first",
     "Visualisation": "Visualisation",
-    "Sky dome page": "Sky dome page",
-    "Served by the web adapter at /skyorama/dome.html, for example http://<ioBroker>:8082/skyorama/dome.html": "Served by the web adapter at /skyorama/dome.html, for example http://<ioBroker>:8082/skyorama/dome.html",
-    "Optional URL parameters: ?radius=30 (aircraft radius in nautical miles), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (another time, within a week), ?instance=1 (another Skyorama instance).": "Optional URL parameters: ?radius=30 (aircraft radius in nautical miles), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (another time, within a week), ?instance=1 (another Skyorama instance)."
+    "Sky dome and flight map pages": "Sky dome and flight map pages",
+    "Served by the web adapter at /skyorama/dome.html and /skyorama/map.html, for example http://<ioBroker>:8082/skyorama/map.html": "Served by the web adapter at /skyorama/dome.html and /skyorama/map.html, for example http://<ioBroker>:8082/skyorama/map.html",
+    "Optional URL parameters: ?units=km, mi or nm, ?radius=50 (aircraft radius in those units), ?heading=90 (dome: a fixed direction at the top), ?figures=0 and ?labels=0 (dome: no constellation figures, no names), ?at=22:00 (dome: another time, within a week), ?instance=1 (another Skyorama instance).": "Optional URL parameters: ?units=km, mi or nm, ?radius=50 (aircraft radius in those units), ?heading=90 (dome: a fixed direction at the top), ?figures=0 and ?labels=0 (dome: no constellation figures, no names), ?at=22:00 (dome: another time, within a week), ?instance=1 (another Skyorama instance).",
+    "Map tiles URL (optional)": "Map tiles URL (optional)",
+    "Tile server for the flight map, with {z}, {x} and {y} (and {s} if it uses subdomains). Respect the tile provider's usage policy. Empty: no map, only range rings.": "Tile server for the flight map, with {z}, {x} and {y} (and {s} if it uses subdomains). Respect the tile provider's usage policy. Empty: no map, only range rings.",
+    "Map attribution": "Map attribution",
+    "The credit the tile provider requires, shown on the map; https:// addresses become links": "The credit the tile provider requires, shown on the map; https:// addresses become links"
 }

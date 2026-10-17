@@ -4,7 +4,7 @@
 import * as Astro from 'astronomy-engine';
 import * as sat from 'satellite.js';
 import { PLANETS, bodyAltAz, sunAltitude } from './astronomy';
-import { STATIONS, catalogueNumber, lookAt, nameOf, type Tle } from './satellites';
+import { STATIONS, catalogueNumber, lookAt, nameOf, type Pass, type Tle } from './satellites';
 import { round, type Location } from './util';
 
 /** satellites are given now and this much later, so the page can move them smoothly between requests */
@@ -25,6 +25,8 @@ export interface SkySatellite {
     el2: number;
     lit: boolean;
     visible: boolean;
+    /** tracked satellites: their next visible pass, if any */
+    nextPass?: { start: number; end: number; maxEl: number; maxAt: number };
 }
 
 export interface SkyNow {
@@ -65,6 +67,7 @@ export function skyNow(
     now: number,
     orbits: { id: string; name: string; rec: sat.SatRec }[],
     tracked: string[],
+    passes: readonly Pass[] = [],
 ): SkyNow {
     const date = new Date(now);
     const sun = bodyAltAz(Astro.Body.Sun, home, now);
@@ -99,6 +102,16 @@ export function skyNow(
             lit: a.lit,
             visible: a.lit && a.el >= VIS_EL && sunEl < SUN_EL,
         });
+        const isTracked = satellites[satellites.length - 1].tracked;
+        const next = isTracked ? passes.find(p => p.sat === o.name && p.end >= now) : undefined;
+        if (next) {
+            satellites[satellites.length - 1].nextPass = {
+                start: next.start,
+                end: next.end,
+                maxEl: next.maxEl,
+                maxAt: next.maxAt,
+            };
+        }
     }
     return {
         at: now,

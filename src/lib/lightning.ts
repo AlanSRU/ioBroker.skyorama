@@ -238,6 +238,13 @@ export class LightningModule {
         this.topics = coverTopics(host.home, cfg.radiusKm, cfg.topicPrefix);
     }
 
+    /** Strikes within the radius in the last hour (newest last), for the map page. */
+    public recentStrikes(now = Date.now()): { radiusKm: number; total: number; strikes: Strike[] } {
+        const recent = this.strikes.filter(s => now - s.t <= KEEP_MS);
+        // a big storm is thousands of strikes: the newest are enough for a map
+        return { radiusKm: this.cfg.radiusKm, total: recent.length, strikes: recent.slice(-JSON_STRIKES) };
+    }
+
     public async start(): Promise<void> {
         // the quiet-spell rule survives restarts: a storm in progress is not "the first strike" again
         this.lastNearAt = num((await this.host.adapter.getStateAsync('lightning.lastNearAt'))?.val) ?? 0;

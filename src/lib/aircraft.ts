@@ -540,6 +540,12 @@ export class AircraftModule {
     /** `sendTo follow { hex }`: where the aircraft is now, wherever it is. Polled every 3 s while asked for. */
     public async follow(hex: string): Promise<FollowResult> {
         const now = Date.now();
+        if (!this.lookupHealth.length) {
+            // no per-aircraft lookup configured: the latest area data is all there is (never a frozen first answer)
+            const seen = this.cache && now - this.cache.at < DEMAND_MS ? this.cache.raw.get(hex) : undefined;
+            const ac = seen ? toFollowed(seen) : null;
+            return ac && this.cache ? { at: this.cache.at, found: true, ac } : { at: now, found: false, ac: null };
+        }
         this.follows.set(hex, now);
         let c = this.followed.get(hex);
         if (!c) {
@@ -553,7 +559,7 @@ export class AircraftModule {
                 c = await this.followOnce(hex);
             }
         }
-        if (this.lookupHealth.length && !this.followTimer && !this.followRunning && !this.host.stopped()) {
+        if (!this.followTimer && !this.followRunning && !this.host.stopped()) {
             this.followTimer = this.host.adapter.setTimeout(() => void this.followTick(), FOLLOW_POLL_MS);
         }
         return c ?? { at: now, found: false, ac: null };

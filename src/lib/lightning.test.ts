@@ -175,6 +175,10 @@ describe('lightning: feed', () => {
         const json = JSON.parse(String(h.writes.filter(w => w.id === 'lightning.strikes').pop()!.val));
         expect(json.total).to.equal(25_000);
         expect(json.strikes).to.have.length(1000);
+        // the map page gets the newest 1000 too, with the true total
+        const recent = h.mod.recentStrikes();
+        expect(recent.total).to.equal(20_000); // what the module keeps of a storm this size
+        expect(recent.strikes).to.have.length(1000);
     });
 
     it('alerts on the first near strike after a quiet spell only', async () => {

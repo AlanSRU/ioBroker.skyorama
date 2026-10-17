@@ -125,7 +125,9 @@
         "notifyAircraftEmergencyCooldown": 30,
         "notifyAircraftEmergencyQuietFrom": 0,
         "notifyAircraftEmergencyQuietTo": 0,
-        "visualisationEnabled": false
+        "visualisationEnabled": false,
+        "mapTilesUrl": "",
+        "mapTilesAttribution": ""
     },
     "objects": [],
     "instanceObjects": [

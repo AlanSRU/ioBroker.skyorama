@@ -304,6 +304,20 @@ describe('aircraft: follow', () => {
         h.mod.stop();
     });
 
+    it('without a lookup URL, follows with the latest area data (never a frozen first answer)', async () => {
+        const h = harness({ lookupUrls: [] });
+        h.respond(() => ({ ac: [raw('aaaaa1', 5)] }));
+        await h.mod.aircraft(10);
+        const first = await h.mod.follow('aaaaa1');
+        h.respond(() => ({ ac: [raw('aaaaa1', 7)] }));
+        (h.mod as unknown as { cache: { at: number } }).cache.at -= 60_000;
+        await h.mod.aircraft(10);
+        const second = await h.mod.follow('aaaaa1');
+        expect(second.ac!.lat).to.be.greaterThan(first.ac!.lat);
+        expect(h.urls.every(u => !u.includes('/hex/'))).to.equal(true);
+        h.mod.stop();
+    });
+
     it('falls back to the second lookup when the first fails', async () => {
         const h = harness();
         h.respond(url => (url.includes('one.example') ? new Error('timeout') : { ac: [raw('bbbbb1', 100)] }));

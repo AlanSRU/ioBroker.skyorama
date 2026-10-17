@@ -420,10 +420,37 @@ class Skyorama extends utils.Adapter {
                 const at =
                     num(m.at) !== null ? Math.min(now + 7 * 86400_000, Math.max(now - 7 * 86400_000, num(m.at)!)) : now;
                 const orbits = this.satellites?.orbits;
-                return skyNow(this.home, at, orbits ? this.satrecs.get(orbits.sats, orbits.at) : [], [
-                    ...(this.satellites?.trackedIds ?? []),
-                ]);
+                return skyNow(
+                    this.home,
+                    at,
+                    orbits ? this.satrecs.get(orbits.sats, orbits.at) : [],
+                    [...(this.satellites?.trackedIds ?? [])],
+                    this.satellites?.visiblePasses ?? [],
+                );
             }
+            case 'mapConfig': {
+                // the flight map page in www/: where home is and what it may show
+                if (!this.config.visualisationEnabled) {
+                    return { error: 'The visualisation is off (instance settings, Visualisation tab)' };
+                }
+                if (!this.home) {
+                    return { error: 'No location' };
+                }
+                return {
+                    home: { lat: this.home.lat, lon: this.home.lon },
+                    tiles: urlSettingOf(this.config.mapTilesUrl).url,
+                    attribution: String(this.config.mapTilesAttribution ?? '').slice(0, 500),
+                    aircraft: !!this.aircraft,
+                    lightning: !!this.lightning,
+                };
+            }
+            case 'lightning':
+                if (!this.config.visualisationEnabled) {
+                    return { error: 'The visualisation is off (instance settings, Visualisation tab)' };
+                }
+                return this.lightning
+                    ? { at: Date.now(), ...this.lightning.recentStrikes() }
+                    : { error: 'Lightning is off' };
             case 'satelliteOptions':
                 // the settings' choice of satellites (selectSendTo): what the current orbit set contains
                 return satelliteOptions(

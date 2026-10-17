@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Skyorama: aircraft around home</title>
+        <link rel="stylesheet" href="lib/leaflet/leaflet.css" />
+        <link rel="stylesheet" href="css/skyorama.css" />
+        <style>
+            body {
+                display: flex;
+                flex-direction: column;
+            }
+            header,
+            footer {
+                display: flex;
+                flex-wrap: wrap;
+                align-items: center;
+                gap: 6px 14px;
+                padding: 8px 12px;
+                font-size: 12px;
+            }
+            #ranges {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px;
+                margin-right: auto;
+            }
+            #map {
+                flex: 1;
+                min-height: 0;
+                background: #0d1220;
+            }
+            /* no tiles configured: a radar-style background */
+            #map.radar {
+                background: radial-gradient(circle at center, #0f1a2e 0%, #070b14 75%);
+            }
+            #legend {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 6px 14px;
+                opacity: 0.8;
+            }
+            #legend i {
+                display: inline-block;
+                width: 10px;
+                height: 10px;
+                margin-right: 6px;
+                border-radius: 50%;
+                vertical-align: -1px;
+            }
+            #summary {
+                margin-left: auto;
+                opacity: 0.75;
+                font-variant-numeric: tabular-nums;
+            }
+            /* below the header bar, which has the range and lightning buttons (phones: a sheet at the bottom) */
+            @media (min-width: 641px) {
+                .sky-info {
+                    top: 52px;
+                    max-height: calc(100vh - 100px);
+                }
+            }
+            /* above the legend */
+            #status {
+                bottom: 48px;
+            }
+            .sky-plane {
+                overflow: visible;
+            }
+            .sky-plane svg {
+                width: 24px;
+                height: 24px;
+                filter: drop-shadow(0 0 2px #000);
+            }
+            .sky-plane b {
+                position: absolute;
+                left: 22px;
+                top: 0;
+                font: 600 11px system-ui, sans-serif;
+                white-space: nowrap;
+                text-shadow:
+                    0 0 3px #000,
+                    0 0 3px #000;
+                line-height: 1.15;
+            }
+            .sky-plane b i {
+                display: block;
+                font-style: normal;
+                font-weight: 500;
+                opacity: 0.85;
+            }
+            .sky-plane.sel svg {
+                filter: drop-shadow(0 0 2px #000) drop-shadow(0 0 6px #ffe24a);
+            }
+            .sky-plane.emerg svg {
+                animation: emerg 1s ease-in-out infinite;
+            }
+            @keyframes emerg {
+                50% {
+                    opacity: 0.35;
+                }
+            }
+            @media (prefers-reduced-motion: reduce) {
+                .sky-plane.emerg svg {
+                    animation: none;
+                }
+            }
+        </style>
+    </head>
+    <body>
+        <header>
+            <div id="ranges"></div>
+            <button id="lightning" class="chip" type="button" aria-pressed="true" hidden>Lightning</button>
+        </header>
+        <div id="map"></div>
+        <footer>
+            <div id="legend"></div>
+            <span id="summary"></span>
+        </footer>
+        <div id="status" role="status"></div>
+        <script src="../lib/js/socket.io.js"></script>
+        <script src="lib/leaflet/leaflet.js"></script>
+        <script src="js/common.js"></script>
+        <script src="js/info.js"></script>
+        <script src="js/map.js"></script>
+    </body>
+</html>
