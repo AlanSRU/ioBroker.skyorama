@@ -104,6 +104,19 @@ export class Notifier {
         private readonly deps: NotifierDeps,
     ) {}
 
+    /** One test message to every target, whatever its events, cooldown or quiet hours. Returns how many were sent. */
+    public test(): number {
+        let sent = 0;
+        for (const t of this.targets) {
+            const p = payloadFor(t.instance, 'Skyorama: Test', 'Test notification from Skyorama', t.recipient);
+            if (p) {
+                this.deps.sendTo(t.instance, p.command, p.payload);
+                sent++;
+            }
+        }
+        return sent;
+    }
+
     public async notify(event: NotifyEvent, message: string, now = new Date()): Promise<void> {
         const targets = this.targets.filter(t => t.events.includes(event));
         if (!message || (!targets.length && !this.admin)) {

@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { EventEmitter } from 'node:events';
 import type { MqttClient } from 'mqtt';
 import type { Host } from './host';
-import { LightningModule, coverCells, coverTopics, geohash, geohashBox, parseStrike } from './lightning';
+import { LightningModule, coverCells, coverTopics, geohash, geohashBox, parseStrike, topicPrefixOf } from './lightning';
 import { metres, type Location } from './util';
 
 const EDINBURGH: Location = { lat: 55.95, lon: -3.19, height: 0 };
@@ -38,7 +38,7 @@ describe('lightning: geohash cover', () => {
         ['near the North Pole', { lat: 88.5, lon: 20, height: 0 }, 300],
     ] as [string, Location, number][]) {
         it(`covers the whole circle with at most 32 topics: ${name}`, () => {
-            const topics = coverTopics(home, km);
+            const topics = coverTopics(home, km, 'blitzortung/1.1');
             expect(topics.length).to.be.within(1, 32);
             const len = topics[0].split('/').length - 3; // blitzortung/1.1/<chars>/#
             const cells = new Set(coverCells(home, km, len));
@@ -48,8 +48,14 @@ describe('lightning: geohash cover', () => {
         });
     }
 
+    it('accepts a topic prefix without wildcards', () => {
+        expect(topicPrefixOf(' /my/feed/ ')).to.equal('my/feed');
+        expect(topicPrefixOf('a/#')).to.equal('');
+        expect(topicPrefixOf('')).to.equal('');
+    });
+
     it('writes one geohash character per topic level', () => {
-        expect(coverTopics(EDINBURGH, 40)[0]).to.match(/^blitzortung\/1\.1\/([0-9a-z]\/)+#$/);
+        expect(coverTopics(EDINBURGH, 40, 'blitzortung/1.1')[0]).to.match(/^blitzortung\/1\.1\/([0-9a-z]\/)+#$/);
     });
 });
 
@@ -104,11 +110,22 @@ function harness(): {
         updateConnection: () => Promise.resolve(),
         notify: () => Promise.resolve(),
     } as unknown as Host;
-    const mod = new LightningModule(host, { radiusKm: 300, nearKm: 40 }, () => {
-        const c = new FakeClient();
-        clients.push(c);
-        return c as unknown as MqttClient;
-    });
+    const mod = new LightningModule(
+        host,
+        {
+            radiusKm: 300,
+            nearKm: 40,
+            brokerUrl: 'mqtt://broker.example:1883',
+            topicPrefix: 'blitzortung/1.1',
+            username: '',
+            password: '',
+        },
+        () => {
+            const c = new FakeClient();
+            clients.push(c);
+            return c as unknown as MqttClient;
+        },
+    );
     const publish = (): Promise<void> => (mod as unknown as { publish: () => Promise<void> }).publish();
     return { mod, clients, timeouts, writes, publish };
 }
@@ -120,7 +137,7 @@ describe('lightning: feed', () => {
         expect(h.mod.health.reachable).to.equal(false);
         h.clients[0].emit('connect');
         expect(h.mod.health.reachable).to.equal(true);
-        expect(h.clients[0].subscribed).to.deep.equal(coverTopics(EDINBURGH, 300));
+        expect(h.clients[0].subscribed).to.deep.equal(coverTopics(EDINBURGH, 300, 'blitzortung/1.1'));
     });
 
     it('reconnects with a growing delay, reset only after a stable connection', async () => {

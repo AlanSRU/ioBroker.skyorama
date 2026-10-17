@@ -1,4 +1,5 @@
-// Aircraft: ADS-B from adsb.lol (area), adsb.fi (one aircraft), or a local readsb/dump1090/tar1090 receiver.
+// Aircraft: ADS-B in the readsb/tar1090 JSON format from sources the user configures: an area source (an API URL
+// with {lat}/{lon}/{radiusNm} placeholders, or a receiver's aircraft.json), and optionally per-aircraft lookups ({hex}).
 // Nothing polls unless something needs it: front-ends asking via sendTo, or the optional background polling for the
 // summary states.
 
@@ -6,7 +7,7 @@ import { AircraftLookup, type LookupResult } from './aircraft-lookup';
 import { SourceHealth } from './health';
 import type { Host } from './host';
 import { HttpError, getJson, getText, type JsonFetcher, type TextFetcher } from './http';
-import { FT, NM, bearing, compass, metres, num, round, type Location } from './util';
+import { FT, NM, bearing, compass, fillUrl, metres, num, round, type Location } from './util';
 
 /** One aircraft in an area answer. Units: ft, knots, nm, degrees, ft/min. */
 export interface Aircraft {
@@ -79,8 +80,8 @@ const AREA_FRESH_MS = 15_000;
 const AREA_TIMEOUT_MS = 15_000;
 const FOLLOW_POLL_MS = 3_000;
 const FOLLOW_KEEP_MS = 10_000;
-/** adsb.fi open data: at most one request a second */
-const ADSBFI_SPACING_MS = 1_100;
+/** the primary per-aircraft lookup: at most one request a second (what public feeds ask for) */
+const LOOKUP_SPACING_MS = 1_100;
 const STALE_S = 30;
 const TRAIL_MS = 15 * 60_000;
 const TRAIL_MIN_M = 400;
@@ -104,7 +105,7 @@ function emergencyOf(a: Raw): string | null {
     return (sq && EMERGENCY_SQUAWK[sq]) || null;
 }
 
-/** readsb JSON (adsb.lol / adsb.fi `ac`, local receiver `aircraft`) → the list. */
+/** readsb JSON (API answers carry `ac`, a receiver's aircraft.json `aircraft`) → the list. */
 export function rawList(data: unknown): Raw[] {
     const d = data as { ac?: unknown; aircraft?: unknown } | null;
     const list = d?.ac ?? d?.aircraft;
@@ -255,8 +256,14 @@ export function summarise(list: Aircraft[], home: Location, overheadEl: number):
 }
 
 export interface AircraftConfig {
-    /** local receiver aircraft.json URL, or '' */
-    receiverUrl: string;
+    /** area source: a URL with {lat}/{lon}/{radiusNm}/{radiusKm}, or a receiver's aircraft.json; '' = none */
+    areaUrl: string;
+    /** per-aircraft lookups ({hex}), primary first; may be empty */
+    lookupUrls: string[];
+    /** route lookup ({callsign}, {prefix} = first two characters), or '' */
+    routeUrl: string;
+    /** optional request header (e.g. an API key), sent only to aircraft URLs on the area source's host */
+    header: { name: string; value: string } | null;
     background: { enabled: boolean; radiusNm: number; intervalMs: number };
     overheadEl: number;
 }
@@ -269,8 +276,8 @@ export interface AircraftDeps {
 /** Runs the module: area polling (on demand and background), followed aircraft, lookups. */
 export class AircraftModule {
     public readonly area: SourceHealth;
-    public readonly adsbfi: SourceHealth;
-    public readonly adsblol: SourceHealth;
+    /** one per configured lookup URL */
+    public readonly lookupHealth: SourceHealth[];
     private readonly lookups: AircraftLookup;
     private readonly trails = new Trails();
     private cache: AreaResult | null = null;
@@ -293,15 +300,32 @@ export class AircraftModule {
         private readonly cfg: AircraftConfig,
         private readonly deps: AircraftDeps = { getJson, getText },
     ) {
-        this.adsblol = new SourceHealth('adsb.lol', host.log, 'adsblol');
-        this.adsbfi = new SourceHealth('adsb.fi', host.log, 'adsbfi');
-        this.area = cfg.receiverUrl ? new SourceHealth('Local receiver', host.log, 'receiver') : this.adsblol;
-        this.lookups = new AircraftLookup(host.log, deps.getJson, deps.getText);
+        this.area = new SourceHealth('Aircraft area source', host.log, 'aircraftArea');
+        this.lookupHealth = cfg.lookupUrls.map((_, i) =>
+            i === 0
+                ? new SourceHealth('Aircraft lookup source', host.log, 'aircraftLookup')
+                : new SourceHealth('Aircraft lookup fallback', host.log, 'aircraftLookup2'),
+        );
+        this.lookups = new AircraftLookup(host.log, deps.getJson, deps.getText, cfg.routeUrl);
+    }
+
+    /** The configured header for a URL on the area source's host (never to another provider). */
+    private headersFor(url: string): Record<string, string> | undefined {
+        const h = this.cfg.header;
+        if (!h || !this.cfg.areaUrl) {
+            return undefined;
+        }
+        try {
+            const host = (u: string): string => new URL(u.replace(/\{\w+\}/g, '0')).host;
+            return host(url) === host(this.cfg.areaUrl) ? { [h.name]: h.value } : undefined;
+        } catch {
+            return undefined;
+        }
     }
 
     /** Sources that can affect info.connection. */
     public get sources(): SourceHealth[] {
-        return this.cfg.receiverUrl ? [this.area, this.adsbfi, this.adsblol] : [this.adsblol, this.adsbfi];
+        return [...(this.cfg.areaUrl ? [this.area] : []), ...this.lookupHealth];
     }
 
     public async start(): Promise<void> {
@@ -324,7 +348,7 @@ export class AircraftModule {
         if (this.host.stopped()) {
             return;
         }
-        if (this.cfg.background.enabled) {
+        if (this.cfg.background.enabled && this.cfg.areaUrl) {
             // spread the load: a jittered first poll after startup
             this.scheduleArea(5_000 + Math.floor(Math.random() * 25_000));
         }
@@ -343,6 +367,9 @@ export class AircraftModule {
     public async aircraft(
         radiusNm: number,
     ): Promise<{ at: number; radiusNm: number; ac: Aircraft[] } | { error: string }> {
+        if (!this.cfg.areaUrl) {
+            return { error: 'No aircraft source configured' };
+        }
         const now = Date.now();
         this.demand.set(radiusNm, now);
         if (!this.covers(radiusNm, now)) {
@@ -428,12 +455,16 @@ export class AircraftModule {
             return;
         }
         const home = this.host.home;
-        const url =
-            this.cfg.receiverUrl ||
-            `https://api.adsb.lol/v2/lat/${home.lat.toFixed(4)}/lon/${home.lon.toFixed(4)}/dist/${Math.ceil(radiusNm)}`;
+        // a template gets home and radius; a receiver feed without placeholders is filtered here anyway
+        const url = fillUrl(this.cfg.areaUrl, {
+            lat: home.lat.toFixed(4),
+            lon: home.lon.toFixed(4),
+            radiusNm: Math.ceil(radiusNm),
+            radiusKm: Math.ceil((radiusNm * NM) / 1000),
+        });
         let data: unknown;
         try {
-            data = await this.deps.getJson(url, AREA_TIMEOUT_MS);
+            data = await this.deps.getJson(url, AREA_TIMEOUT_MS, this.headersFor(url));
             // a wrong receiver path (404) or any answer without an aircraft list is a failure, not "no aircraft"
             if (!hasList(data)) {
                 throw new Error(
@@ -522,7 +553,7 @@ export class AircraftModule {
                 c = await this.followOnce(hex);
             }
         }
-        if (!this.followTimer && !this.followRunning && !this.host.stopped()) {
+        if (this.lookupHealth.length && !this.followTimer && !this.followRunning && !this.host.stopped()) {
             this.followTimer = this.host.adapter.setTimeout(() => void this.followTick(), FOLLOW_POLL_MS);
         }
         return c ?? { at: now, found: false, ac: null };
@@ -566,18 +597,18 @@ export class AircraftModule {
         return this.followed.get(hex);
     }
 
-    /** adsb.fi first (fast, ≤ 1 request/s), adsb.lol as the fallback. null when both fail. */
+    /** The primary lookup (at most one request a second), then the fallback. null when none answers. */
     private async fetchFollowed(hex: string): Promise<FollowResult | null> {
-        const sources: [SourceHealth, string, number][] = [
-            [this.adsbfi, `https://opendata.adsb.fi/api/v2/hex/${hex}`, 4_000],
-            [this.adsblol, `https://api.adsb.lol/v2/hex/${hex}`, 8_000],
-        ];
+        const sources = this.cfg.lookupUrls.map(
+            (u, i) =>
+                [this.lookupHealth[i], fillUrl(u, { hex }), i === 0 ? 4_000 : 8_000] as [SourceHealth, string, number],
+        );
         for (const [health, url, timeout] of sources) {
             try {
-                if (health === this.adsbfi) {
-                    await this.adsbfiSlot();
+                if (health === this.lookupHealth[0]) {
+                    await this.lookupSlot();
                 }
-                const data = await this.deps.getJson(url, timeout);
+                const data = await this.deps.getJson(url, timeout, this.headersFor(url));
                 if (this.host.stopped()) {
                     return null;
                 }
@@ -598,10 +629,10 @@ export class AircraftModule {
         return null;
     }
 
-    /** Wait for a free adsb.fi slot: requests at least 1.1 s apart, across everything that asks. */
-    private adsbfiSlot(): Promise<void> {
+    /** Wait for a free slot on the primary lookup: requests at least 1.1 s apart, across everything that asks. */
+    private lookupSlot(): Promise<void> {
         const run = this.fiQueue.then(async () => {
-            const gapMs = this.lastFiAt + ADSBFI_SPACING_MS - Date.now();
+            const gapMs = this.lastFiAt + LOOKUP_SPACING_MS - Date.now();
             if (gapMs > 0) {
                 await this.host.adapter.delay(gapMs);
             }

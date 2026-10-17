@@ -1,14 +1,12 @@
-// Lightning: strikes near home from the Blitzortung community MQTT feed (the broker run for Home Assistant's
-// Blitzortung integration). Strikes are published per geohash, one character per topic level, so the adapter
-// subscribes to the geohash cells that cover the configured radius around home.
+// Lightning: strikes near home from an MQTT feed in the Blitzortung format that the user configures (broker URL and
+// topic prefix). Strikes are published per geohash, one character per topic level, so the adapter subscribes to the
+// geohash cells that cover the configured radius around home.
 
 import type { IClientOptions, MqttClient } from 'mqtt';
 import { SourceHealth } from './health';
 import type { Host } from './host';
 import { bearing, compass, metres, num, round, type Location } from './util';
 
-const BROKER = 'mqtt://blitzortung.ha.sed.pl:1883';
-const TOPIC_ROOT = 'blitzortung/1.1';
 const KEEP_MS = 3600_000;
 /** strikes kept for the nearest/near checks (the oldest are dropped first); the hourly count is exact regardless */
 const MAX_STRIKES = 20_000;
@@ -151,15 +149,21 @@ export function coverCells(home: Location, radiusKm: number, len: number): strin
     return [...cells].filter(c => distanceToBox(home.lat, home.lon, geohashBox(c)) <= radiusKm * 1000).sort();
 }
 
-/** The finest cover with at most 32 cells (fewer, larger cells for big radii). */
-export function coverTopics(home: Location, radiusKm: number): string[] {
+/** Topic prefix from the settings: MQTT topic levels without wildcards, no leading/trailing slash. */
+export function topicPrefixOf(setting: unknown): string {
+    const s = typeof setting === 'string' ? setting.trim().replace(/^\/+|\/+$/g, '') : '';
+    return /^[^#+\s]+$/.test(s) ? s : '';
+}
+
+/** The finest cover with at most 32 cells (fewer, larger cells for big radii), as topics under `prefix`. */
+export function coverTopics(home: Location, radiusKm: number, prefix: string): string[] {
     for (let len = 4; len >= 1; len--) {
         const cells = coverCells(home, radiusKm, len);
         if (cells.length <= MAX_CELLS || len === 1) {
-            return cells.map(c => `${TOPIC_ROOT}/${c.split('').join('/')}/#`);
+            return cells.map(c => `${prefix}/${c.split('').join('/')}/#`);
         }
     }
-    return [`${TOPIC_ROOT}/#`];
+    return [`${prefix}/#`];
 }
 
 export interface Strike {
@@ -195,6 +199,13 @@ export function parseStrike(payload: string, home: Location, now: number): Strik
 export interface LightningConfig {
     radiusKm: number;
     nearKm: number;
+    /** mqtt(s):// or ws(s):// broker URL */
+    brokerUrl: string;
+    /** topic prefix, e.g. the feed's version path */
+    topicPrefix: string;
+    /** optional broker login */
+    username: string;
+    password: string;
 }
 
 export type MqttConnect = (url: string, opts: IClientOptions) => MqttClient;
@@ -221,10 +232,10 @@ export class LightningModule {
         private readonly cfg: LightningConfig,
         private readonly connect: MqttConnect,
     ) {
-        this.health = new SourceHealth('Blitzortung', host.log, 'blitzortung');
+        this.health = new SourceHealth('Lightning feed', host.log, 'lightning');
         // a persistent feed: not reachable until it has connected once
         this.health.unproven();
-        this.topics = coverTopics(host.home, cfg.radiusKm);
+        this.topics = coverTopics(host.home, cfg.radiusKm, cfg.topicPrefix);
     }
 
     public async start(): Promise<void> {
@@ -233,7 +244,7 @@ export class LightningModule {
         if (this.host.stopped()) {
             return;
         }
-        this.host.log.debug(`Blitzortung: ${this.topics.length} topics for ${this.cfg.radiusKm} km`);
+        this.host.log.debug(`Lightning feed: ${this.topics.length} topics for ${this.cfg.radiusKm} km`);
         this.open();
         this.publishTimer = this.host.adapter.setInterval(() => void this.publish(), PUBLISH_MS);
     }
@@ -253,9 +264,10 @@ export class LightningModule {
         if (this.host.stopped()) {
             return;
         }
-        const client = this.connect(BROKER, {
+        const client = this.connect(this.cfg.brokerUrl, {
             reconnectPeriod: 0,
             connectTimeout: 15_000,
+            ...(this.cfg.username ? { username: this.cfg.username, password: this.cfg.password } : {}),
             clientId: `skyorama_${Math.random().toString(16).slice(2, 10)}`,
         });
         this.client = client;
@@ -268,7 +280,7 @@ export class LightningModule {
             void this.host.updateConnection();
             client.subscribe(this.topics, err => {
                 if (err && !this.host.stopped()) {
-                    this.host.log.warn(`Blitzortung: subscribe failed: ${err.message}`);
+                    this.host.log.warn(`Lightning feed: subscribe failed: ${err.message}`);
                 }
             });
         });

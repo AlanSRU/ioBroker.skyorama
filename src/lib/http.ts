@@ -11,9 +11,11 @@ export class HttpError extends Error {
     }
 }
 
-async function get(url: string, timeoutMs: number): Promise<Response> {
+async function get(url: string, timeoutMs: number, headers: Record<string, string> = {}): Promise<Response> {
     const res = await fetch(url, {
-        headers: { 'User-Agent': USER_AGENT },
+        headers: { ...headers, 'User-Agent': USER_AGENT },
+        // a configured header (an API key) must not follow a redirect to another host
+        redirect: Object.keys(headers).length ? 'error' : 'follow',
         signal: AbortSignal.timeout(timeoutMs),
     });
     if (!res.ok && res.status !== 404) {
@@ -32,13 +34,13 @@ export async function getText(url: string, timeoutMs: number): Promise<string> {
 }
 
 /** GET JSON. null for 404 ("nothing known"); throws on network errors, timeouts, other non-2xx and bad JSON. */
-export async function getJson(url: string, timeoutMs: number): Promise<unknown> {
-    const res = await get(url, timeoutMs);
+export async function getJson(url: string, timeoutMs: number, headers?: Record<string, string>): Promise<unknown> {
+    const res = await get(url, timeoutMs, headers);
     if (res.status === 404) {
         return null;
     }
     return res.json();
 }
 
-export type JsonFetcher = (url: string, timeoutMs: number) => Promise<unknown>;
+export type JsonFetcher = (url: string, timeoutMs: number, headers?: Record<string, string>) => Promise<unknown>;
 export type TextFetcher = (url: string, timeoutMs: number) => Promise<string>;

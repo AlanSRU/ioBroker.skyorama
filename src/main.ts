@@ -10,7 +10,7 @@ import { AstronomyModule } from './lib/astronomy';
 import { AuroraModule } from './lib/aurora';
 import type { SourceHealth } from './lib/health';
 import type { Host } from './lib/host';
-import { LightningModule } from './lib/lightning';
+import { LightningModule, topicPrefixOf } from './lib/lightning';
 import { EVENTS, Notifier, targetsFrom, type EventRule, type NotifyEvent } from './lib/notify';
 import {
     aircraftObjects,
@@ -31,7 +31,7 @@ import {
     trackedIds,
     type Tle,
 } from './lib/satellites';
-import { NM, clamp, num, receiverUrlOf, toLocation, type Location } from './lib/util';
+import { NM, clamp, num, toLocation, urlSettingOf, type Location } from './lib/util';
 
 class Skyorama extends utils.Adapter {
     private unloaded = false;
@@ -90,25 +90,40 @@ class Skyorama extends utils.Adapter {
         }));
         const astro = !!this.config.astronomyEnabled;
         const planes = !!this.config.aircraftEnabled;
-        const receiver = receiverUrlOf(this.config.receiverUrl);
-        if (planes && receiver.problem) {
-            // the URL itself is not logged: it may contain a password
-            this.log.warn(`Local receiver URL ${receiver.problem}: using adsb.lol instead`);
+        // every external feed is the user's own choice: nothing is used unless configured
+        const areaUrl = planes ? this.urlSetting('Aircraft area source URL', this.config.aircraftAreaUrl) : '';
+        const lookupUrls = planes
+            ? [
+                  this.urlSetting('Aircraft lookup URL', this.config.aircraftLookupUrl),
+                  this.urlSetting('Aircraft lookup fallback URL', this.config.aircraftLookupUrl2),
+              ].filter(Boolean)
+            : [];
+        const routeUrl = planes ? this.urlSetting('Route lookup URL', this.config.aircraftRouteUrl) : '';
+        if (planes && !areaUrl) {
+            this.log.warn('Aircraft is on but no aircraft area source is configured');
         }
-        const receiverUrl = receiver.url;
+        const header = planes ? this.headerSetting() : null;
         const background = planes && !!this.config.backgroundEnabled;
         const aurora = !!this.config.auroraEnabled;
         const auroraWatch = aurora && !!this.config.auroraWatchUk;
-        const lightning = !!this.config.lightningEnabled;
+        const brokerUrl = this.config.lightningEnabled
+            ? this.urlSetting('Lightning broker URL', this.config.lightningBrokerUrl, [
+                  'mqtt:',
+                  'mqtts:',
+                  'ws:',
+                  'wss:',
+              ])
+            : '';
+        const topicPrefix = topicPrefixOf(this.config.lightningTopicPrefix);
+        if (this.config.lightningEnabled && (!brokerUrl || !topicPrefix)) {
+            this.log.warn('Lightning is on but no valid feed (broker URL and topic prefix) is configured');
+        }
+        const lightning = !!this.config.lightningEnabled && !!brokerUrl && !!topicPrefix;
         const sources = [
             ...(sats ? [{ id: 'celestrak', name: 'CelesTrak' }] : []),
-            ...(planes
-                ? [
-                      { id: 'adsblol', name: 'adsb.lol' },
-                      { id: 'adsbfi', name: 'adsb.fi' },
-                  ]
-                : []),
-            ...(planes && receiverUrl ? [{ id: 'receiver', name: 'Local receiver' }] : []),
+            ...(areaUrl ? [{ id: 'aircraftArea', name: 'Aircraft area source' }] : []),
+            ...(lookupUrls.length ? [{ id: 'aircraftLookup', name: 'Aircraft lookup source' }] : []),
+            ...(lookupUrls.length > 1 ? [{ id: 'aircraftLookup2', name: 'Aircraft lookup fallback' }] : []),
             ...(aurora
                 ? [
                       { id: 'noaa', name: 'NOAA SWPC' },
@@ -116,7 +131,7 @@ class Skyorama extends utils.Adapter {
                   ]
                 : []),
             ...(auroraWatch ? [{ id: 'aurorawatch', name: 'AuroraWatch UK' }] : []),
-            ...(lightning ? [{ id: 'blitzortung', name: 'Blitzortung' }] : []),
+            ...(lightning ? [{ id: 'lightning', name: 'Lightning feed' }] : []),
         ];
         // Disabled modules keep their objects (and the user's history/alias settings on them).
         await this.ensureObjects([
@@ -161,7 +176,10 @@ class Skyorama extends utils.Adapter {
         }
         if (planes) {
             this.aircraft = new AircraftModule(host, {
-                receiverUrl,
+                areaUrl,
+                lookupUrls,
+                routeUrl,
+                header,
                 background: {
                     enabled: background,
                     radiusNm: (clamp(this.config.backgroundRadiusKm, 1, (MAX_RADIUS_NM * NM) / 1000, 30) * 1000) / NM,
@@ -186,7 +204,14 @@ class Skyorama extends utils.Adapter {
             const radiusKm = clamp(this.config.lightningRadiusKm, 10, 1000, 300);
             this.lightning = new LightningModule(
                 host,
-                { radiusKm, nearKm: clamp(this.config.lightningNearKm, 1, radiusKm, 40) },
+                {
+                    radiusKm,
+                    nearKm: clamp(this.config.lightningNearKm, 1, radiusKm, 40),
+                    brokerUrl,
+                    topicPrefix,
+                    username: String(this.config.lightningUsername ?? '').trim(),
+                    password: String(this.config.lightningPassword ?? ''),
+                },
                 connect,
             );
         }
@@ -204,6 +229,33 @@ class Skyorama extends utils.Adapter {
             return;
         }
         await this.lightning?.start();
+    }
+
+    /** A source URL from the settings, or '' with a warning saying why (the URL itself is not logged). */
+    private urlSetting(label: string, value: unknown, schemes?: string[]): string {
+        const r = urlSettingOf(value, schemes);
+        if (r.problem) {
+            this.log.warn(`${label} ${r.problem}: not used`);
+        }
+        return r.url;
+    }
+
+    /** The optional aircraft request header: a token name and a value without line breaks, or null. */
+    private headerSetting(): { name: string; value: string } | null {
+        const name = String(this.config.aircraftHeaderName ?? '').trim();
+        const value = String(this.config.aircraftHeaderValue ?? '').trim();
+        if (!name && !value) {
+            return null;
+        }
+        if (
+            !/^[A-Za-z0-9!#$%&'*+.^_`|~-]{1,64}$/.test(name) ||
+            !value ||
+            [...value].some(c => c.charCodeAt(0) < 32 || c.charCodeAt(0) === 127)
+        ) {
+            this.log.warn('Aircraft request header is incomplete or invalid: not used');
+            return null;
+        }
+        return { name, value };
     }
 
     /** A satellite removed from the selection takes its objects with it (its passes mean nothing any more). */
@@ -339,6 +391,16 @@ class Skyorama extends utils.Adapter {
         switch (command) {
             case 'tle':
                 return this.satellites ? this.satellites.orbits : { error: 'Satellites module is off' };
+            case 'testNotification': {
+                // the Notifications tab's test button (saved settings)
+                if (!this.notifier) {
+                    return { error: 'Notifications are not running (see the log)' };
+                }
+                const n = this.notifier.test();
+                return n
+                    ? { result: `Test notification sent to ${n} instance${n === 1 ? '' : 's'}` }
+                    : { error: 'No usable notification target is saved' };
+            }
             case 'satelliteOptions':
                 // the settings' choice of satellites (selectSendTo): what the current orbit set contains
                 return satelliteOptions(

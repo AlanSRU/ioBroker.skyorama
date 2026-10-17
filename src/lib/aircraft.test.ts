@@ -12,7 +12,7 @@ import {
 } from './aircraft';
 import type { Host } from './host';
 import { HttpError } from './http';
-import { NM, receiverUrlOf, type Location } from './util';
+import { NM, urlSettingOf, type Location } from './util';
 
 const HOME: Location = { lat: 55.95, lon: -3.19, height: 0 };
 /** a point `nm` nautical miles due north of home */
@@ -31,7 +31,7 @@ describe('aircraft: feed data', () => {
         expect(hexOf(123456)).to.equal(null);
     });
 
-    it('reads both the adsb.lol (ac) and the receiver (aircraft) format', () => {
+    it('reads both the API (ac) and the receiver (aircraft) format', () => {
         expect(rawList({ ac: [{ hex: 'a' }] })).to.have.length(1);
         expect(rawList({ aircraft: [{ hex: 'a' }, null] })).to.have.length(1);
         expect(rawList(null)).to.deep.equal([]);
@@ -174,7 +174,10 @@ function harness(
     const mod = new AircraftModule(
         host,
         {
-            receiverUrl: '',
+            areaUrl: 'https://area.example/v2/lat/{lat}/lon/{lon}/dist/{radiusNm}',
+            lookupUrls: ['https://one.example/hex/{hex}', 'https://two.example/hex/{hex}'],
+            routeUrl: '',
+            header: null,
             background: { enabled: false, radiusNm: 16, intervalMs: 60_000 },
             overheadEl: 45,
             ...cfg,
@@ -203,7 +206,7 @@ describe('aircraft: polling model', () => {
         const h = harness();
         h.respond(() => new HttpError(429));
         expect(await h.mod.aircraft(10)).to.deep.equal({ error: 'No aircraft data yet' });
-        expect(h.mod.adsblol.used).to.equal(true);
+        expect(h.mod.area.used).to.equal(true);
         h.mod.stop();
     });
 
@@ -235,10 +238,10 @@ describe('aircraft: polling model', () => {
     });
 
     it('treats a wrong receiver path (404) or an answer without a list as a failure', async () => {
-        const h = harness({ receiverUrl: 'http://192.0.2.1/data/aircraft.json' });
+        const h = harness({ areaUrl: 'http://192.0.2.1/data/aircraft.json' });
         h.respond(() => null);
         expect(await h.mod.aircraft(10)).to.deep.equal({ error: 'No aircraft data yet' });
-        const h2 = harness({ receiverUrl: 'http://192.0.2.1/' });
+        const h2 = harness({ areaUrl: 'http://192.0.2.1/' });
         h2.respond(() => ({ hello: 'world' }));
         // a success (even an empty one) would have answered with a list
         expect(await h2.mod.aircraft(10)).to.deep.equal({ error: 'No aircraft data yet' });
@@ -270,12 +273,12 @@ describe('aircraft: polling model', () => {
     });
 
     it('uses the local receiver and filters by distance itself', async () => {
-        const h = harness({ receiverUrl: 'http://192.0.2.1/data/aircraft.json' });
+        const h = harness({ areaUrl: 'http://192.0.2.1/data/aircraft.json' });
         h.respond(() => ({ aircraft: [raw('aaaaa1', 5), raw('aaaaa2', 30)] }));
         const r = (await h.mod.aircraft(10)) as { ac: Aircraft[] };
         expect(h.urls).to.deep.equal(['http://192.0.2.1/data/aircraft.json']);
         expect(r.ac.map(a => a.hex)).to.deep.equal(['aaaaa1']);
-        expect(h.mod.sources.map(s => s.id)).to.deep.equal(['receiver', 'adsbfi', 'adsblol']);
+        expect(h.mod.sources.map(s => s.id)).to.deep.equal(['aircraftArea', 'aircraftLookup', 'aircraftLookup2']);
         h.mod.stop();
     });
 
@@ -301,14 +304,11 @@ describe('aircraft: follow', () => {
         h.mod.stop();
     });
 
-    it('falls back to adsb.lol when adsb.fi fails', async () => {
+    it('falls back to the second lookup when the first fails', async () => {
         const h = harness();
-        h.respond(url => (url.includes('adsb.fi') ? new Error('timeout') : { ac: [raw('bbbbb1', 100)] }));
+        h.respond(url => (url.includes('one.example') ? new Error('timeout') : { ac: [raw('bbbbb1', 100)] }));
         const f = await h.mod.follow('bbbbb1');
-        expect(h.urls).to.deep.equal([
-            'https://opendata.adsb.fi/api/v2/hex/bbbbb1',
-            'https://api.adsb.lol/v2/hex/bbbbb1',
-        ]);
+        expect(h.urls).to.deep.equal(['https://one.example/hex/bbbbb1', 'https://two.example/hex/bbbbb1']);
         expect(f.found).to.equal(true);
         h.mod.stop();
     });
@@ -321,7 +321,7 @@ describe('aircraft: follow', () => {
         h.mod.stop();
     });
 
-    it('spaces adsb.fi requests at least 1.1 s apart', async () => {
+    it('spaces requests to the primary lookup at least 1.1 s apart', async () => {
         const h = harness();
         h.respond(() => ({ ac: [] }));
         await Promise.all([h.mod.follow('ddddd1'), h.mod.follow('ddddd2')]);
@@ -331,19 +331,56 @@ describe('aircraft: follow', () => {
     });
 });
 
-describe('aircraft: receiver URL setting', () => {
-    it('accepts plain http(s) URLs', () => {
-        expect(receiverUrlOf(' http://192.168.1.20/tar1090/data/aircraft.json ')).to.deep.equal({
+describe('aircraft: source URL settings', () => {
+    it('accepts http(s) URLs, with placeholders', () => {
+        expect(urlSettingOf(' http://192.168.1.20/tar1090/data/aircraft.json ')).to.deep.equal({
             url: 'http://192.168.1.20/tar1090/data/aircraft.json',
         });
-        expect(receiverUrlOf('')).to.deep.equal({ url: '' });
+        expect(urlSettingOf('https://x.example/lat/{lat}/lon/{lon}').url).to.equal(
+            'https://x.example/lat/{lat}/lon/{lon}',
+        );
+        expect(urlSettingOf('')).to.deep.equal({ url: '' });
+        expect(urlSettingOf('mqtt://broker:1883', ['mqtt:', 'mqtts:']).url).to.equal('mqtt://broker:1883');
     });
 
     it('rejects credentials, other schemes and junk without returning the URL', () => {
-        const withPassword = receiverUrlOf('http://user:secret@192.168.1.20/data/aircraft.json');
+        const withPassword = urlSettingOf('http://user:secret@192.168.1.20/data/aircraft.json');
         expect(withPassword.url).to.equal('');
         expect(withPassword.problem).to.not.contain('secret');
-        expect(receiverUrlOf('ftp://host/aircraft.json').url).to.equal('');
-        expect(receiverUrlOf('not a url').url).to.equal('');
+        expect(urlSettingOf('ftp://host/aircraft.json').url).to.equal('');
+        expect(urlSettingOf('not a url').url).to.equal('');
+        expect(urlSettingOf('http://broker', ['mqtt:']).url).to.equal('');
+    });
+});
+
+describe('aircraft: configured sources', () => {
+    it('does nothing without an area source', async () => {
+        const h = harness({ areaUrl: '' });
+        expect(await h.mod.aircraft(10)).to.deep.equal({ error: 'No aircraft source configured' });
+        expect(h.urls).to.deep.equal([]);
+        h.mod.stop();
+    });
+
+    it('sends the request header only to URLs on the area source host', async () => {
+        const seen: [string, Record<string, string> | undefined][] = [];
+        const h = harness({
+            areaUrl: 'https://one.example/area/{lat}/{lon}/{radiusNm}',
+            header: { name: 'X-Api-Key', value: 'k' },
+        });
+        const m = h.mod as unknown as {
+            deps: { getJson: (u: string, t: number, hd?: Record<string, string>) => Promise<unknown> };
+        };
+        m.deps.getJson = (u, _t, hd) => {
+            seen.push([u, hd]);
+            return Promise.resolve(
+                u.includes('two.example') ? { ac: [raw('ccccc1', 3)] } : Promise.reject(new Error('x')),
+            );
+        };
+        await h.mod.aircraft(10);
+        await h.mod.follow('ccccc1');
+        expect(seen.find(s => s[0].includes('one.example/area'))![1]).to.deep.equal({ 'X-Api-Key': 'k' });
+        expect(seen.find(s => s[0].includes('one.example/hex'))![1]).to.deep.equal({ 'X-Api-Key': 'k' });
+        expect(seen.find(s => s[0].includes('two.example'))![1]).to.equal(undefined);
+        h.mod.stop();
     });
 });

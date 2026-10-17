@@ -89,8 +89,13 @@
         "passAlertLeadMin": 10,
         "passAlertMinEl": 20,
         "astronomyEnabled": true,
-        "aircraftEnabled": true,
-        "receiverUrl": "",
+        "aircraftEnabled": false,
+        "aircraftAreaUrl": "",
+        "aircraftLookupUrl": "",
+        "aircraftLookupUrl2": "",
+        "aircraftRouteUrl": "",
+        "aircraftHeaderName": "",
+        "aircraftHeaderValue": "",
         "backgroundEnabled": false,
         "backgroundRadiusKm": 30,
         "backgroundIntervalS": 60,
@@ -102,6 +107,10 @@
         "lightningEnabled": false,
         "lightningRadiusKm": 300,
         "lightningNearKm": 40,
+        "lightningBrokerUrl": "",
+        "lightningTopicPrefix": "blitzortung/1.1",
+        "lightningUsername": "",
+        "lightningPassword": "",
         "notifyTargets": [],
         "notifyAdmin": false,
         "notifySatellitePassCooldown": 0,
@@ -141,7 +150,7 @@
             "native": {}
         }
     ],
-    "protectedNative": ["notifyTargets"],
+    "protectedNative": ["notifyTargets", "aircraftHeaderValue", "lightningUsername", "lightningPassword"],
     "notifications": [
         {
             "scope": "skyorama",
@@ -302,5 +311,6 @@
                 }
             ]
         }
-    ]
+    ],
+    "encryptedNative": ["aircraftHeaderValue", "lightningPassword"]
 }

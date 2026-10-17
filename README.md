@@ -27,15 +27,26 @@ Each module can be switched on or off in the instance settings. Switching a modu
 
 #### Aircraft
 
-- Positions come from the free community ADS-B feeds [adsb.lol](https://adsb.lol/) (aircraft around you) and
-  [adsb.fi](https://adsb.fi/) (one aircraft wherever it is, at most one request a second), or from your own receiver
-  ([readsb](https://github.com/wiedehopf/readsb), dump1090 or [tar1090](https://github.com/wiedehopf/tar1090)
-  `aircraft.json`) if you enter its URL.
+- Skyorama has no built-in aircraft data source: you choose and configure your own (off by default). It reads the
+  readsb/tar1090 JSON format:
+  - **area source** (required): your own receiver's `aircraft.json` ([readsb](https://github.com/wiedehopf/readsb),
+    dump1090 or [tar1090](https://github.com/wiedehopf/tar1090)), or an API URL with the placeholders `{lat}`, `{lon}`
+    and `{radiusNm}` (or `{radiusKm}`);
+  - **aircraft lookup** (optional, with an optional fallback): one aircraft wherever it is, for following it, a URL
+    with `{hex}`; the first is asked at most once a second;
+  - **route lookup** (optional): route files in the [VRS standing data](https://github.com/vradarserver/standing-data)
+    format, a URL with `{callsign}` and `{prefix}` (its first two characters);
+  - an optional request header for services that need an API key (stored encrypted, and sent only to aircraft URLs on
+    the area source's host).
+
+  Check the terms of any service you use; many free community feeds are for personal, non-commercial use and ask for
+  gentle request rates.
 - Nothing is polled unless something needs it: a front-end asking through `sendTo` (every 10 seconds while asked, for
   the widest radius asked for in the last minute), or the optional background polling for the `aircraft.*` states.
-- Details for one aircraft (route, photo, airline) come from the [VRS standing data](https://github.com/vradarserver/standing-data)
-  and [planespotters.net](https://www.planespotters.net/) (photos are returned with the photographer's name and a link,
-  as their terms ask). They are loaded only when asked for and cached (routes 1 day, photos 7 days).
+- Details for one aircraft: the route (from the route lookup, if configured), a photo from
+  [planespotters.net](https://www.planespotters.net/) (returned with the photographer's name and a link, as their terms
+  ask) and the airline name from the VRS standing data airline list. They are loaded only when asked for and cached
+  (routes 1 day, photos 7 days).
 
 #### Aurora
 
@@ -54,10 +65,11 @@ index is added to the text. An alert text is written when the aurora turns possi
 
 #### Lightning
 
-Strikes from the [Blitzortung.org](https://www.blitzortung.org/) community lightning network, received through the
-public MQTT feed run for Home Assistant's Blitzortung integration. The adapter subscribes only to the area around you
-(the geohash cells that cover the configured radius). Off by default. Blitzortung data may be used for private,
-non-commercial purposes only.
+Strikes from an MQTT feed in the [Blitzortung.org](https://www.blitzortung.org/) format (strike JSON published per
+geohash, one character per topic level) that you configure: broker URL (`mqtt://`, `mqtts://`, `ws://` or `wss://`),
+topic prefix and an optional login (the password is stored encrypted). The adapter subscribes only to the area around
+you (the geohash cells that cover the configured radius). Off by default. Blitzortung data may be used for private,
+non-commercial purposes only; check the terms of the feed you use.
 
 An alert text is written for the first strike within the near radius (default 40 km) after half an hour without one.
 
@@ -88,6 +100,7 @@ build your own rules. Skyorama can also send them itself, set up on the **Notifi
 
 - a table of messaging instances, each with the events it should receive (satellite pass, aurora, lightning,
   aircraft emergency) and an optional recipient;
+- a **Send a test notification** button (uses the saved settings);
 - per event, a cooldown (at most one message in that time) and quiet hours (no messages, in the ioBroker host's time);
 - optionally, the ioBroker notification system as well (shown in Admin, and passed on by
   [notification-manager](https://github.com/foxriver76/ioBroker.notification-manager) to the messenger set up there).
@@ -103,7 +116,7 @@ Telegram a user, for ntfy a topic. Aircraft emergencies are sent only with backg
 |---|---|
 | `info.connection` | All data sources in use are reachable (false until the first successful fetch, and after two failed attempts in a row) |
 | `info.celestrak` | CelesTrak reachable |
-| `info.adsblol` / `info.adsbfi` / `info.receiver` | The aircraft feeds reachable (written once a feed has been used) |
+| `info.aircraftArea` / `info.aircraftLookup` / `info.aircraftLookup2` | The configured aircraft sources reachable (written once a source has been used) |
 | `aircraft.count` | Aircraft within the background radius (background polling only, like all `aircraft.*` states) |
 | `aircraft.overhead` | An airborne aircraft is at least the set angle above the horizon (default 45°) |
 | `aircraft.nearest.*` | Nearest airborne aircraft: `callsign`, `type`, `registration`, `altitude` (ft), `distance` (km), `bearing` (°), `elevation` (°) |
@@ -126,7 +139,7 @@ Telegram a user, for ntfy a topic. Aircraft emergencies are sent only with backg
 | `lightning.lastNearAt` | Time of the latest strike within the near radius |
 | `lightning.strikes` | The newest strikes (up to 1000) within the radius in the last hour, updated at most once a minute (JSON `{ at, radiusKm, total, strikes: [{ lat, lon, t, km }] }`) |
 | `lightning.alert` | Alert text for the first near strike after a quiet half hour |
-| `info.noaa` / `info.openmeteo` / `info.aurorawatch` / `info.blitzortung` | Those sources reachable |
+| `info.noaa` / `info.openmeteo` / `info.aurorawatch` / `info.lightning` | Those sources reachable |
 
 Times are timestamps in milliseconds. A value that does not exist (for example no next moonrise in the polar summer)
 is `null`.
@@ -173,6 +186,7 @@ An optional overhead-dome and flight-map visualisation.
 * (Alan Paris) Satellites (ISS and Tiangong passes, pass alerts, orbit set) and astronomy (darkness, moon, planets, tonight's sky)
 * (Alan Paris) Aircraft: nearby aircraft, following one aircraft and aircraft details for front-ends, optional background states
 * (Alan Paris) Aurora (visible from home now?) and lightning nearby (Blitzortung)
+* (Alan Paris) Aircraft and lightning sources are configured by the user (URLs, optional API header, broker login); none built in
 * (Alan Paris) Choose up to 20 satellites for passes and alerts (ISS and Tiangong by default)
 * (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event
 

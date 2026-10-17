@@ -14,13 +14,13 @@ const all: ObjectDef[] = [
     ...instanceObjects.map(o => ({ id: o._id, obj: o as unknown as ioBroker.SettableObject })),
     ...infoObjects([
         { id: 'celestrak', name: 'CelesTrak' },
-        { id: 'adsblol', name: 'adsb.lol' },
-        { id: 'adsbfi', name: 'adsb.fi' },
-        { id: 'receiver', name: 'Local receiver' },
+        { id: 'aircraftArea', name: 'Aircraft area source' },
+        { id: 'aircraftLookup', name: 'Aircraft lookup source' },
+        { id: 'aircraftLookup2', name: 'Aircraft lookup fallback' },
         { id: 'noaa', name: 'NOAA SWPC' },
         { id: 'openmeteo', name: 'Open-Meteo' },
         { id: 'aurorawatch', name: 'AuroraWatch UK' },
-        { id: 'blitzortung', name: 'Blitzortung' },
+        { id: 'lightning', name: 'Lightning feed' },
     ]),
     ...satelliteObjects([
         { key: 'iss', name: 'ISS' },

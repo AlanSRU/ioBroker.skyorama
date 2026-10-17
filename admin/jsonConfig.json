@@ -150,10 +150,10 @@
                     "lg": 12,
                     "xl": 12
                 },
-                "receiverUrl": {
+                "aircraftAreaUrl": {
                     "type": "text",
-                    "label": "Local receiver URL (optional)",
-                    "help": "aircraft.json of your own dump1090, readsb or tar1090 receiver, e.g. http://192.168.1.20/tar1090/data/aircraft.json. Used instead of adsb.lol for aircraft around you.",
+                    "label": "Aircraft area source URL",
+                    "help": "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.",
                     "disabled": "!data.aircraftEnabled",
                     "newLine": true,
                     "xs": 12,
@@ -161,6 +161,64 @@
                     "md": 8,
                     "lg": 6,
                     "xl": 6
+                },
+                "aircraftLookupUrl": {
+                    "type": "text",
+                    "label": "Aircraft lookup URL (optional)",
+                    "help": "One aircraft wherever it is, for following it: a URL with {hex}. Asked at most once a second.",
+                    "disabled": "!data.aircraftEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "aircraftLookupUrl2": {
+                    "type": "text",
+                    "label": "Aircraft lookup fallback URL (optional)",
+                    "help": "Used when the first lookup fails: a URL with {hex}",
+                    "disabled": "!data.aircraftEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "aircraftRouteUrl": {
+                    "type": "text",
+                    "label": "Route lookup URL (optional)",
+                    "help": "Route files in the VRS standing data format: a URL with {callsign} and {prefix} (its first two characters)",
+                    "disabled": "!data.aircraftEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "aircraftHeaderName": {
+                    "type": "text",
+                    "label": "Request header name (optional)",
+                    "help": "For services that need an API key in a header. Sent only to aircraft URLs on the same host as the area source.",
+                    "disabled": "!data.aircraftEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "aircraftHeaderValue": {
+                    "type": "password",
+                    "label": "Request header value",
+                    "disabled": "!data.aircraftEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
                 },
                 "backgroundEnabled": {
                     "type": "checkbox",
@@ -285,6 +343,50 @@
                     "lg": 12,
                     "xl": 12
                 },
+                "lightningBrokerUrl": {
+                    "type": "text",
+                    "label": "MQTT broker URL",
+                    "help": "A feed in the Blitzortung format: mqtt://, mqtts://, ws:// or wss://. Check the terms of the feed you use.",
+                    "disabled": "!data.lightningEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 8,
+                    "lg": 6,
+                    "xl": 6
+                },
+                "lightningTopicPrefix": {
+                    "type": "text",
+                    "label": "Topic prefix",
+                    "help": "Strikes are expected under <prefix>/<geohash, one character per level>",
+                    "disabled": "!data.lightningEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "lightningUsername": {
+                    "type": "text",
+                    "label": "Broker user name (optional)",
+                    "disabled": "!data.lightningEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
+                "lightningPassword": {
+                    "type": "password",
+                    "label": "Broker password (optional)",
+                    "disabled": "!data.lightningEnabled",
+                    "xs": 12,
+                    "sm": 6,
+                    "md": 4,
+                    "lg": 3,
+                    "xl": 3
+                },
                 "lightningRadiusKm": {
                     "type": "number",
                     "label": "Strike radius (km)",
@@ -401,6 +503,20 @@
                             "default": true
                         }
                     ]
+                },
+                "notifyTest": {
+                    "type": "sendTo",
+                    "command": "testNotification",
+                    "label": "Send a test notification",
+                    "help": "Uses the saved settings: save first",
+                    "variant": "outlined",
+                    "showProcess": true,
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 6,
+                    "lg": 4,
+                    "xl": 4
                 },
                 "notifyAdmin": {
                     "type": "checkbox",

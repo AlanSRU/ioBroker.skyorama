@@ -96,25 +96,34 @@ export function round(n: number, digits = 0): number {
 }
 
 /**
- * The local receiver URL from the settings: an http(s) URL without a user name or password (fetch refuses those, and
- * its error message would put the password in the log). `problem` says why a non-empty setting is not used.
+ * A source URL from the settings: one of the allowed schemes, no user name or password (fetch refuses those, and its
+ * error message would put the password in the log). `{placeholders}` are allowed and kept. `problem` says why a
+ * non-empty setting is not used (without repeating the URL, which may contain a secret).
  */
-export function receiverUrlOf(setting: unknown): { url: string; problem?: string } {
+export function urlSettingOf(
+    setting: unknown,
+    schemes: string[] = ['http:', 'https:'],
+): { url: string; problem?: string } {
     const s = typeof setting === 'string' ? setting.trim() : '';
     if (!s) {
         return { url: '' };
     }
     let u: URL;
     try {
-        u = new URL(s);
+        u = new URL(s.replace(/\{\w+\}/g, '0'));
     } catch {
         return { url: '', problem: 'is not a valid URL' };
     }
-    if (u.protocol !== 'http:' && u.protocol !== 'https:') {
-        return { url: '', problem: 'is not an http(s) URL' };
+    if (!schemes.includes(u.protocol)) {
+        return { url: '', problem: `must start with ${schemes.map(x => `${x}//`).join(' or ')}` };
     }
     if (u.username || u.password) {
         return { url: '', problem: 'must not contain a user name or password (not supported)' };
     }
-    return { url: u.href };
+    return { url: s };
+}
+
+/** Fill `{name}` placeholders (values URL-encoded); unknown placeholders stay as they are. */
+export function fillUrl(template: string, values: Record<string, string | number>): string {
+    return template.replace(/\{(\w+)\}/g, (m, k: string) => (k in values ? encodeURIComponent(String(values[k])) : m));
 }

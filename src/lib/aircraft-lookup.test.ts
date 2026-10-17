@@ -62,6 +62,23 @@ describe('aircraft lookup: parsing', () => {
 describe('aircraft lookup: caching', () => {
     const quiet = { warn: () => undefined, info: () => undefined, debug: () => undefined };
 
+    it('looks nothing up without a route URL', async () => {
+        const urls: string[] = [];
+        const lookup = new AircraftLookup(
+            quiet,
+            url => {
+                urls.push(url);
+                return Promise.resolve(null);
+            },
+            () => Promise.resolve(''),
+            '',
+        );
+        expect(
+            (await lookup.lookup({ hex: 'abc123', flight: 'BAW123', reg: null, lat: null, lon: null })).route,
+        ).to.equal(null);
+        expect(urls.some(u => u.includes('route'))).to.equal(false);
+    });
+
     it('caches answers, "nothing known" too, but not errors', async () => {
         const urls: string[] = [];
         let fail = true;
@@ -75,6 +92,7 @@ describe('aircraft lookup: caching', () => {
                 return Promise.resolve(url.includes('/routes/') ? ROUTE : null);
             },
             () => Promise.resolve('Code,Name,ICAO\n1,British Airways,BAW\n'),
+            'https://r.example/routes/{prefix}/{callsign}.json',
         );
         const q = { hex: 'abc123', flight: 'BAW123', reg: 'G-ABCD', lat: 54, lon: -2 };
         const first = await lookup.lookup(q);

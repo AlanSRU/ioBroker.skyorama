@@ -3,7 +3,7 @@
 
 import { SourceHealth, type HealthLog } from './health';
 import type { JsonFetcher, TextFetcher } from './http';
-import { NM, metres, num } from './util';
+import { NM, fillUrl, metres, num } from './util';
 
 export interface Airport {
     lat: number;
@@ -193,14 +193,18 @@ export class AircraftLookup {
     private airlinesLoading: Promise<void> | null = null;
     private readonly vrs: SourceHealth;
     private readonly planespotters: SourceHealth;
+    private readonly airlineList: SourceHealth;
 
     public constructor(
         log: HealthLog,
         private readonly getJson: JsonFetcher,
         private readonly getText: TextFetcher,
+        /** route lookup URL ({callsign}, {prefix}), or '' for none */
+        private readonly routeUrl: string,
     ) {
-        this.vrs = new SourceHealth('VRS standing data', log);
+        this.vrs = new SourceHealth('Route lookup', log);
         this.planespotters = new SourceHealth('planespotters.net', log);
+        this.airlineList = new SourceHealth('Airline list', log);
     }
 
     public async lookup(q: {
@@ -219,7 +223,7 @@ export class AircraftLookup {
     }
 
     private async route(callsign: string, lat: number | null, lon: number | null): Promise<Route | null> {
-        if (!/^[A-Z0-9]{3,8}$/.test(callsign)) {
+        if (!this.routeUrl || !/^[A-Z0-9]{3,8}$/.test(callsign)) {
             return null;
         }
         const now = Date.now();
@@ -235,7 +239,7 @@ export class AircraftLookup {
         }
         try {
             const data = await this.getJson(
-                `https://vrs-standing-data.adsb.lol/routes/${callsign.slice(0, 2)}/${callsign}.json`,
+                fillUrl(this.routeUrl, { callsign, prefix: callsign.slice(0, 2) }),
                 TIMEOUT_MS,
             );
             this.vrs.ok();
@@ -286,10 +290,10 @@ export class AircraftLookup {
             try {
                 this.airlines = parseAirlines(await this.getText(AIRLINES_URL, 20_000));
                 this.airlinesFailed = false;
-                this.vrs.ok();
+                this.airlineList.ok();
             } catch (err) {
                 this.airlinesFailed = true;
-                this.vrs.fail(err);
+                this.airlineList.fail(err);
             }
             this.airlinesAt = Date.now();
             this.airlinesLoading = null;
