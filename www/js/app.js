@@ -2,7 +2,7 @@
  * The dome page: connects to ioBroker through the web adapter's socket, asks Skyorama for the sky (and aircraft, if
  * an aircraft source is configured) every 10 s, and draws the dome about ten times a second.
  * URL parameters: ?instance=0 (Skyorama instance), ?radius=30 (aircraft radius in nautical miles),
- * ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (the next 22:00) or ?at=2026-10-24T22:00
+ * ?heading=90 (a fixed direction at the top, e.g. for a wall screen facing east), ?figures=0 (no constellation figures), ?labels=0 (no names), ?at=22:00 (the next 22:00) or ?at=2026-10-24T22:00
  * (another time, within a week; live aircraft are left out then).
  */
 (function () {
@@ -88,6 +88,68 @@
 
     socket.on('connect', () => void poll());
     socket.on('disconnect', () => show('Connection to ioBroker lost, reconnecting…'));
+    // A fixed direction at the top (wall screens), used whenever the compass is off.
+    const fixedHeading = Number.isFinite(Number(params.get('heading'))) ? Number(params.get('heading')) : 0;
+    dome.setHeading(fixedHeading);
+
+    // Compass: on phones and tablets, turn the dome so that its north points to real north. Browsers give pages the
+    // compass only over HTTPS; iOS also asks for permission, which needs a tap.
+    const compassBtn = document.getElementById('compass');
+    let heading = null;
+    let lastReading = 0;
+    const onOrientation = e => {
+        const angle = (screen.orientation && screen.orientation.angle) || window.orientation || 0;
+        const h = window.SkyoramaDome.compassHeading(e, angle);
+        if (h !== null) {
+            heading = window.SkyoramaDome.smoothHeading(heading, h, 0.25);
+            lastReading = Date.now();
+            dome.setHeading(heading);
+        }
+    };
+    const compassOff = () => {
+        window.removeEventListener('deviceorientationabsolute', onOrientation);
+        window.removeEventListener('deviceorientation', onOrientation);
+        heading = null;
+        dome.setHeading(fixedHeading);
+        compassBtn.setAttribute('aria-pressed', 'false');
+    };
+    // only on touch devices: desktop browsers know the event but have no compass
+    if ('DeviceOrientationEvent' in window && navigator.maxTouchPoints > 0) {
+        compassBtn.hidden = false;
+        compassBtn.addEventListener('click', async () => {
+            if (compassBtn.getAttribute('aria-pressed') === 'true') {
+                compassOff();
+                return;
+            }
+            if (!window.isSecureContext) {
+                show('The compass works only when this page is opened over HTTPS');
+                return;
+            }
+            const DOE = window.DeviceOrientationEvent;
+            if (typeof DOE.requestPermission === 'function') {
+                try {
+                    if ((await DOE.requestPermission()) !== 'granted') {
+                        show('No permission to use the compass');
+                        return;
+                    }
+                } catch {
+                    show('No permission to use the compass');
+                    return;
+                }
+            }
+            compassBtn.setAttribute('aria-pressed', 'true');
+            lastReading = 0;
+            window.addEventListener('deviceorientationabsolute', onOrientation);
+            window.addEventListener('deviceorientation', onOrientation);
+            setTimeout(() => {
+                if (!lastReading && compassBtn.getAttribute('aria-pressed') === 'true') {
+                    compassOff();
+                    show('No compass reading from this device');
+                }
+            }, 3000);
+        });
+    }
+
     // a hidden page asks for nothing (aircraft polling on the adapter stops when nobody asks)
     setInterval(() => {
         if (!document.hidden) {

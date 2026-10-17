@@ -154,6 +154,32 @@
         };
     }
 
+    /**
+     * Compass heading (degrees from north, clockwise) of the top of the screen from a device orientation event, or null
+     * when the event has no absolute heading. `screenAngle`: the screen's rotation (0, 90, 180, 270).
+     */
+    function compassHeading(e, screenAngle) {
+        let h = null;
+        if (e && typeof e.webkitCompassHeading === 'number' && e.webkitCompassHeading >= 0) {
+            h = e.webkitCompassHeading; // iOS: already a compass heading
+        } else if (e && e.absolute && typeof e.alpha === 'number') {
+            h = 360 - e.alpha; // alpha turns anticlockwise from north
+        }
+        if (h === null) {
+            return null;
+        }
+        return (((h + (screenAngle || 0)) % 360) + 360) % 360;
+    }
+
+    /** Smooth a heading towards a new reading, the short way round. */
+    function smoothHeading(prev, next, k) {
+        if (prev == null) {
+            return next;
+        }
+        const d = ((next - prev + 540) % 360) - 180;
+        return (((prev + d * k) % 360) + 360) % 360;
+    }
+
     /** Angle between two directions in the sky, degrees. */
     function separation(a, b) {
         const cos =
@@ -226,6 +252,20 @@
             this.bgFor = null;
             this.size = 0;
             this.dpr = 1;
+            /** where the top of the picture points (compass heading); 0 = north up */
+            this.heading = 0;
+        }
+
+        /**
+         * Turn the dome so that the top of the picture points to `heading` (degrees from north, e.g. a phone's compass
+         * heading); null or 0: north up. Names stay upright.
+         */
+        setHeading(heading) {
+            const h = heading == null || !Number.isFinite(heading) ? 0 : ((heading % 360) + 360) % 360;
+            if (Math.abs(((h - this.heading + 540) % 360) - 180) >= 0.5) {
+                this.heading = h;
+                this.bgFor = null; // the slow layer is redrawn for the new direction
+            }
         }
 
         /** The answer of `sendTo('skyorama.N', 'sky')`. */
@@ -270,7 +310,7 @@
 
         xy(az, el) {
             const r = this.ringR(el);
-            const a = az * RAD;
+            const a = (az - this.heading) * RAD;
             return [this.size / 2 + r * Math.sin(a), this.size / 2 - r * Math.cos(a)];
         }
 
@@ -490,7 +530,7 @@
                 ['S', 180],
                 ['W', 270],
             ]) {
-                const a = az * RAD;
+                const a = (az - this.heading) * RAD;
                 c.fillText(t, cx + (R + 13) * Math.sin(a), cy - (R + 13) * Math.cos(a));
             }
             c.textAlign = 'left';
@@ -636,5 +676,7 @@
     SkyoramaDome.skyColours = skyColours;
     SkyoramaDome.separation = separation;
     SkyoramaDome.towards = towards;
+    SkyoramaDome.compassHeading = compassHeading;
+    SkyoramaDome.smoothHeading = smoothHeading;
     global.SkyoramaDome = SkyoramaDome;
 })(window);

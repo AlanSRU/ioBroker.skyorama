@@ -22,10 +22,13 @@ interface DomeStatics {
     skyColours(sun: number): [string, string];
     separation(a: { az: number; el: number }, b: { az: number; el: number }): number;
     towards(a: { az: number; el: number }, b: { az: number; el: number }, deg: number): { az: number; el: number };
+    compassHeading(e: Record<string, unknown>, screenAngle?: number): number | null;
+    smoothHeading(prev: number | null, next: number, k: number): number;
 }
 function loadDome(): DomeStatics {
     const window: Record<string, unknown> = {};
-    runInNewContext(readFileSync(join(__dirname, '../../www/js/dome.js'), 'utf8'), { window });
+    const document = { createElement: () => ({}) };
+    runInNewContext(readFileSync(join(__dirname, '../../www/js/dome.js'), 'utf8'), { window, document });
     return window.SkyoramaDome as DomeStatics;
 }
 
@@ -92,6 +95,39 @@ describe('sky: the dome page', () => {
         expect(dome.separation(p, sun)).to.be.closeTo(dome.separation(moon, sun) - 0.5, 1e-6);
         expect(p.el).to.be.below(moon.el);
         expect(p.az).to.be.above(moon.az);
+    });
+
+    it('reads the compass heading from iOS and Android orientation events', () => {
+        expect(dome.compassHeading({ webkitCompassHeading: 75 })).to.equal(75);
+        expect(dome.compassHeading({ absolute: true, alpha: 90 })).to.equal(270); // alpha turns anticlockwise
+        expect(dome.compassHeading({ absolute: false, alpha: 90 })).to.equal(null); // relative: no north
+        expect(dome.compassHeading({ webkitCompassHeading: 350 }, 90)).to.equal(80); // landscape
+    });
+
+    it('smooths the heading the short way round north', () => {
+        expect(dome.smoothHeading(null, 10, 0.25)).to.equal(10);
+        expect(dome.smoothHeading(350, 10, 0.5)).to.be.closeTo(0, 1e-9);
+        expect(dome.smoothHeading(10, 350, 0.5)).to.be.closeTo(0, 1e-9);
+    });
+
+    it('turns the picture so that the heading points up', () => {
+        const Dome = dome as unknown as {
+            new (c: unknown): {
+                size: number;
+                heading: number;
+                setHeading(h: number): void;
+                xy(az: number, el: number): [number, number];
+            };
+        };
+        const d = new Dome({});
+        d.size = 200;
+        const [nx, ny] = d.xy(0, 0);
+        expect(nx).to.be.closeTo(100, 1e-9);
+        expect(ny).to.be.lessThan(100); // north at the top
+        d.setHeading(90); // facing east
+        const [ex, ey] = d.xy(90, 0);
+        expect(ex).to.be.closeTo(100, 1e-9);
+        expect(ey).to.be.lessThan(100); // east now at the top
     });
 
     it('colours the sky black at night and blue by day', () => {

@@ -34,6 +34,21 @@
                 font-weight: 600;
                 opacity: 0.75;
             }
+            #compass {
+                position: fixed;
+                top: 8px;
+                right: 12px;
+                padding: 6px 12px;
+                border: 1px solid rgba(255, 255, 255, 0.35);
+                border-radius: 16px;
+                background: rgba(20, 26, 40, 0.7);
+                color: inherit;
+                font: inherit;
+                font-size: 14px;
+            }
+            #compass[aria-pressed='true'] {
+                background: rgba(70, 120, 200, 0.85);
+            }
             #status {
                 position: fixed;
                 left: 50%;
@@ -51,6 +66,7 @@
     <body>
         <main><canvas id="dome" aria-label="The sky above home"></canvas></main>
         <div id="clock"></div>
+        <button id="compass" type="button" aria-pressed="false" hidden>Compass</button>
         <div id="status" role="status"></div>
         <script src="../lib/js/socket.io.js"></script>
         <script src="js/skydata.js"></script>

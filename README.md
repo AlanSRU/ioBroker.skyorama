@@ -107,7 +107,10 @@ says so.
   hide the fainter ones). The sun and moon are always shown when up.
 - Satellites you track are always shown (faint when they can't be seen); other satellites only when visible.
   Aircraft are shown when an aircraft source is configured.
-- URL parameters: `?radius=30` (aircraft radius in nautical miles), `?figures=0` (no constellation figures),
+- On phones and tablets, the **Compass** button turns the dome so that its north points to real north (browsers allow
+  this only when the page is opened over HTTPS; iOS asks for permission once).
+- URL parameters: `?radius=30` (aircraft radius in nautical miles), `?heading=90` (a fixed direction at the top, e.g.
+  for a wall screen facing east), `?figures=0` (no constellation figures),
   `?labels=0` (no names), `?at=22:00` (another time, within a week), `?instance=1`.
 - The drawing code (`www/js/dome.js`) has no dependencies, so it can be embedded elsewhere, e.g. in an iframe on a
   dashboard.
