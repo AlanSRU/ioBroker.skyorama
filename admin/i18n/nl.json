@@ -86,5 +86,7 @@
     "Visualisation": "Visualisatie",
     "With more cloud than this the aurora counts as not visible": "Bij meer bewolking geldt het poollicht als niet zichtbaar",
     "aurora-nowcast instance for the Kp index": "aurora-nowcast-instantie voor de Kp-index",
-    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "readsb/tar1090-JSON: een API-URL met {lat}, {lon} en {radiusNm} of {radiusKm}, of de aircraft.json van uw eigen ontvanger. Controleer de voorwaarden van de dienst die u gebruikt."
+    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "readsb/tar1090-JSON: een API-URL met {lat}, {lon} en {radiusNm} of {radiusKm}, of de aircraft.json van uw eigen ontvanger. Controleer de voorwaarden van de dienst die u gebruikt.",
+    "Stargazing forecast": "Sterrenkijkverwachting",
+    "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours": "Bewolking voor vannacht van Open-Meteo (api.open-meteo.com), elke 2 uur"
 }

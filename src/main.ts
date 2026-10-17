@@ -6,7 +6,8 @@
 import * as utils from '@iobroker/adapter-core';
 import { AircraftModule, MAX_RADIUS_NM, hexOf } from './lib/aircraft';
 import { connect } from 'mqtt';
-import { AstronomyModule } from './lib/astronomy';
+import { AstronomyModule, tonight } from './lib/astronomy';
+import { SkyExtrasModule, nightTimeline } from './lib/skyevents';
 import { AuroraModule } from './lib/aurora';
 import type { SourceHealth } from './lib/health';
 import type { Host } from './lib/host';
@@ -16,6 +17,7 @@ import { EVENTS, Notifier, targetsFrom, type EventRule, type NotifyEvent } from 
 import {
     aircraftObjects,
     astronomyObjects,
+    skyExtrasObjects,
     auroraObjects,
     infoObjects,
     lightningObjects,
@@ -38,6 +40,7 @@ class Skyorama extends utils.Adapter {
     private unloaded = false;
     private satellites: SatellitesModule | undefined;
     private astronomy: AstronomyModule | undefined;
+    private skyExtras: SkyExtrasModule | undefined;
     private aircraft: AircraftModule | undefined;
     private aurora: AuroraModule | undefined;
     private lightning: LightningModule | undefined;
@@ -93,6 +96,7 @@ class Skyorama extends utils.Adapter {
             ),
         }));
         const astro = !!this.config.astronomyEnabled;
+        const forecast = astro && this.config.skyForecastEnabled !== false;
         const planes = !!this.config.aircraftEnabled;
         // every external feed is the user's own choice: nothing is used unless configured
         const areaUrl = planes ? this.urlSetting('Aircraft area source URL', this.config.aircraftAreaUrl) : '';
@@ -134,6 +138,7 @@ class Skyorama extends utils.Adapter {
                       { id: 'openmeteo', name: 'Open-Meteo' },
                   ]
                 : []),
+            ...(forecast ? [{ id: 'forecast', name: 'Open-Meteo forecast' }] : []),
             ...(auroraWatch ? [{ id: 'aurorawatch', name: 'AuroraWatch UK' }] : []),
             ...(lightning ? [{ id: 'lightning', name: 'Lightning feed' }] : []),
         ];
@@ -142,6 +147,7 @@ class Skyorama extends utils.Adapter {
             ...infoObjects(sources),
             ...(sats ? satelliteObjects(trackedObjects) : []),
             ...(astro ? astronomyObjects() : []),
+            ...(astro ? skyExtrasObjects(forecast) : []),
             ...(background ? aircraftObjects() : []),
             ...(aurora ? auroraObjects() : []),
             ...(lightning ? lightningObjects() : []),
@@ -176,7 +182,12 @@ class Skyorama extends utils.Adapter {
             );
         }
         if (astro) {
-            this.astronomy = new AstronomyModule(host, () => this.satellites?.visiblePasses ?? []);
+            this.skyExtras = new SkyExtrasModule(host, forecast, () => void this.astronomy?.refreshTonight());
+            this.astronomy = new AstronomyModule(
+                host,
+                () => this.satellites?.visiblePasses ?? [],
+                () => this.skyExtras?.tonightLines ?? [],
+            );
         }
         if (planes) {
             this.aircraft = new AircraftModule(host, {
@@ -225,6 +236,10 @@ class Skyorama extends utils.Adapter {
             return;
         }
         await this.astronomy?.start();
+        if (this.unloaded) {
+            return;
+        }
+        await this.skyExtras?.start();
         if (this.unloaded) {
             return;
         }
@@ -353,6 +368,7 @@ class Skyorama extends utils.Adapter {
     private async updateConnection(): Promise<void> {
         const all: SourceHealth[] = [
             ...(this.satellites ? [this.satellites.health] : []),
+            ...(this.skyExtras?.health ? [this.skyExtras.health] : []),
             ...(this.aircraft?.sources ?? []),
             ...(this.aurora?.sources ?? []),
             ...(this.lightning ? [this.lightning.health] : []),
@@ -445,6 +461,37 @@ class Skyorama extends utils.Adapter {
                     lightning: !!this.lightning,
                 };
             }
+            case 'upcoming': {
+                // the "upcoming" page in www/: tonight, the forecast, meteor showers, eclipses, events
+                if (!this.config.visualisationEnabled) {
+                    return { error: 'The visualisation is off (instance settings, Visualisation tab)' };
+                }
+                if (!this.home || !this.skyExtras) {
+                    return { error: this.home ? 'Astronomy is off' : 'No location' };
+                }
+                const now = Date.now();
+                const n = tonight(this.home, now, this.satellites?.visiblePasses ?? []);
+                return {
+                    at: now,
+                    tonight: n,
+                    timeline: nightTimeline(this.home, now),
+                    // every visible pass still to come (the satellites module predicts 72 hours)
+                    passes: (this.satellites?.visiblePasses ?? [])
+                        .filter(p => p.end > now)
+                        .map(p => ({
+                            sat: p.sat,
+                            start: p.start,
+                            end: p.end,
+                            maxEl: Math.round(p.maxEl),
+                            fromAz: Math.round(p.fromAz),
+                            toAz: Math.round(p.toAz),
+                        })),
+                    tonightLines: this.skyExtras.tonightLines,
+                    forecast: this.skyExtras.forecast.filter(h => h.t >= now - 3600_000),
+                    forecastEnabled: !!this.skyExtras.health,
+                    ...this.skyExtras.latest,
+                };
+            }
             case 'lightning':
                 if (!this.config.visualisationEnabled) {
                     return { error: 'The visualisation is off (instance settings, Visualisation tab)' };
@@ -496,6 +543,7 @@ class Skyorama extends utils.Adapter {
         try {
             this.satellites?.stop();
             this.astronomy?.stop();
+            this.skyExtras?.stop();
             this.aircraft?.stop();
             this.aurora?.stop();
             this.lightning?.stop();

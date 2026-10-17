@@ -86,5 +86,7 @@
     "Visualisation": "可视化",
     "With more cloud than this the aurora counts as not visible": "云量超过此值时，极光视为不可见",
     "aurora-nowcast instance for the Kp index": "用于 Kp 指数的 aurora-nowcast 实例",
-    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "readsb/tar1090 JSON：包含 {lat}、{lon} 以及 {radiusNm} 或 {radiusKm} 的 API URL，或您自己接收机的 aircraft.json。请查看所用服务的条款。"
+    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "readsb/tar1090 JSON：包含 {lat}、{lon} 以及 {radiusNm} 或 {radiusKm} 的 API URL，或您自己接收机的 aircraft.json。请查看所用服务的条款。",
+    "Stargazing forecast": "观星预报",
+    "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours": "来自 Open-Meteo（api.open-meteo.com）的今晚云量，每 2 小时更新"
 }

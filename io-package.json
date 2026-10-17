@@ -89,6 +89,7 @@
         "passAlertLeadMin": 10,
         "passAlertMinEl": 20,
         "astronomyEnabled": true,
+        "skyForecastEnabled": true,
         "aircraftEnabled": false,
         "aircraftAreaUrl": "",
         "aircraftLookupUrl": "",

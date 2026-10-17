@@ -301,6 +301,7 @@ export class AstronomyModule {
     public constructor(
         private readonly host: Host,
         private readonly getPasses: () => readonly Pass[],
+        private readonly extraLines: () => string[] = () => [],
     ) {}
 
     public async start(): Promise<void> {
@@ -315,6 +316,10 @@ export class AstronomyModule {
     /** Recompute tonight's summary now (new passes). */
     public async refreshTonight(): Promise<void> {
         const n = tonight(this.host.home, Date.now(), this.getPasses());
+        const extra = this.extraLines();
+        if (n.dark && extra.length) {
+            n.text += ` ${extra.map(l => `${l}.`).join(' ')}`;
+        }
         this.lastTonight = n.at;
         await this.host.write('astronomy.tonight', JSON.stringify(n));
         await this.host.write('astronomy.tonightText', n.text);

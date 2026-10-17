@@ -86,5 +86,7 @@
     "Map attribution": "Map attribution",
     "The credit the tile provider requires, shown on the map; https:// addresses become links": "The credit the tile provider requires, shown on the map; https:// addresses become links",
     "Dark map": "Dark map",
-    "Turns a light map style dark, to suit the page": "Turns a light map style dark, to suit the page"
+    "Turns a light map style dark, to suit the page": "Turns a light map style dark, to suit the page",
+    "Stargazing forecast": "Stargazing forecast",
+    "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours": "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours"
 }

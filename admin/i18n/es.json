@@ -86,5 +86,7 @@
     "Visualisation": "Visualización",
     "With more cloud than this the aurora counts as not visible": "Con más nubes que esto, la aurora se considera no visible",
     "aurora-nowcast instance for the Kp index": "Instancia de aurora-nowcast para el índice Kp",
-    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "JSON readsb/tar1090: una URL de API con {lat}, {lon} y {radiusNm} o {radiusKm}, o el aircraft.json de su propio receptor. Consulte las condiciones del servicio que use."
+    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "JSON readsb/tar1090: una URL de API con {lat}, {lon} y {radiusNm} o {radiusKm}, o el aircraft.json de su propio receptor. Consulte las condiciones del servicio que use.",
+    "Stargazing forecast": "Previsión para observar las estrellas",
+    "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours": "Nubosidad para esta noche de Open-Meteo (api.open-meteo.com), cada 2 horas"
 }

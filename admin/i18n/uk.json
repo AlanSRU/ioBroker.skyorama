@@ -86,5 +86,7 @@
     "Visualisation": "Візуалізація",
     "With more cloud than this the aurora counts as not visible": "За більшої хмарності сяйво вважається невидимим",
     "aurora-nowcast instance for the Kp index": "Екземпляр aurora-nowcast для індексу Kp",
-    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "JSON readsb/tar1090: URL API з {lat}, {lon} і {radiusNm} або {radiusKm} чи aircraft.json вашого приймача. Перевірте умови сервісу, яким користуєтеся."
+    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "JSON readsb/tar1090: URL API з {lat}, {lon} і {radiusNm} або {radiusKm} чи aircraft.json вашого приймача. Перевірте умови сервісу, яким користуєтеся.",
+    "Stargazing forecast": "Прогноз для спостереження зірок",
+    "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours": "Хмарність на цю ніч від Open-Meteo (api.open-meteo.com), кожні 2 години"
 }

@@ -164,3 +164,21 @@ export function lightningObjects(): ObjectDef[] {
         text('lightning.alert', 'Lightning alert'),
     ];
 }
+
+/** Meteor showers, eclipses, moon and planet events, and (optional) the stargazing forecast. */
+export function skyExtrasObjects(forecast: boolean): ObjectDef[] {
+    return [
+        json('astronomy.meteors', 'Meteor showers (JSON)', '{}'),
+        text('astronomy.meteorsText', 'Meteor showers'),
+        json('astronomy.eclipses', 'Next eclipses seen from here (JSON)', '{}'),
+        text('astronomy.eclipsesText', 'Next eclipses seen from here'),
+        json('astronomy.events', 'Moon and planet events, next 30 days (JSON)', '[]'),
+        text('astronomy.eventsText', 'Next moon and planet events'),
+        ...(forecast
+            ? [
+                  json('astronomy.forecast', 'Cloud forecast (JSON)', '{}'),
+                  text('astronomy.forecastText', 'Stargazing forecast for tonight'),
+              ]
+            : []),
+    ];
+}

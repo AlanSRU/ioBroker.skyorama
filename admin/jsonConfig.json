@@ -132,6 +132,18 @@
                     "md": 12,
                     "lg": 12,
                     "xl": 12
+                },
+                "skyForecastEnabled": {
+                    "type": "checkbox",
+                    "label": "Stargazing forecast",
+                    "help": "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours",
+                    "hidden": "!data.astronomyEnabled",
+                    "newLine": true,
+                    "xs": 12,
+                    "sm": 12,
+                    "md": 12,
+                    "lg": 12,
+                    "xl": 12
                 }
             }
         },

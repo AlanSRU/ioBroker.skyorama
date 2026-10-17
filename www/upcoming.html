@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1"
+        />
+        <title>Skyorama: tonight and coming up</title>
+        <link
+            rel="stylesheet"
+            href="css/skyorama.css"
+        />
+        <style>
+            body {
+                overflow: auto;
+            }
+            main {
+                max-width: 1100px;
+                margin: 0 auto;
+                padding: 20px 16px 40px;
+            }
+            h1,
+            h2 {
+                margin: 0;
+                font-weight: 600;
+            }
+            h1 {
+                font-size: 26px;
+            }
+            h2 {
+                margin: 36px 0 6px;
+                font-size: 13px;
+                letter-spacing: 0.12em;
+                text-transform: uppercase;
+                opacity: 0.55;
+            }
+            #summary {
+                margin: 6px 0 18px;
+                font-size: 15px;
+                line-height: 1.5;
+                opacity: 0.85;
+            }
+            #summary b {
+                color: #fff;
+            }
+            /* the timeline */
+            #night {
+                display: block;
+                width: 100%;
+                overflow: visible;
+                font:
+                    12px system-ui,
+                    sans-serif;
+            }
+            #night .label {
+                fill: #dfe6f3;
+                opacity: 0.75;
+            }
+            #night .small {
+                font-size: 11px;
+                fill: #dfe6f3;
+                opacity: 0.6;
+            }
+            #night .hi {
+                fill: #ffe27a;
+            }
+            #deepsky {
+                margin: 12px 0 0;
+                font-size: 13px;
+                opacity: 0.65;
+            }
+            /* coming up */
+            #list {
+                margin: 0;
+                padding: 0;
+                list-style: none;
+            }
+            #list li {
+                display: grid;
+                grid-template-columns: 7.5em minmax(0, 1fr);
+                gap: 14px;
+                padding: 7px 0;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+                font-variant-numeric: tabular-nums;
+                line-height: 1.4;
+            }
+            #list time {
+                opacity: 0.6;
+            }
+            #list li.hi b {
+                color: #ffe27a;
+            }
+            #list small {
+                display: block;
+                opacity: 0.6;
+            }
+            footer {
+                margin-top: 18px;
+                font-size: 12px;
+                opacity: 0.45;
+            }
+        </style>
+    </head>
+    <body>
+        <main>
+            <h1 id="title">Tonight</h1>
+            <p id="summary"></p>
+            <svg
+                id="night"
+                role="img"
+                aria-label="Tonight, from sunset to sunrise"
+            ></svg>
+            <p id="deepsky"></p>
+            <h2>Coming up</h2>
+            <ul id="list"></ul>
+            <footer id="updated"></footer>
+        </main>
+        <div
+            id="status"
+            role="status"
+            hidden
+        ></div>
+        <script src="../lib/js/socket.io.js"></script>
+        <script src="js/common.js"></script>
+        <script src="js/dome.js"></script>
+        <script src="js/upcoming.js"></script>
+    </body>
+</html>

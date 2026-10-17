@@ -229,6 +229,7 @@ VIS-2 widgets for the dome and the map.
 * (Alan Paris) Aircraft and lightning sources are configured by the user (URLs, optional API header, broker login); none built in
 * (Alan Paris) Choose up to 20 satellites for passes and alerts (ISS and Tiangong by default)
 * (Alan Paris) Notifications to messaging adapters and ioBroker notifications, with cooldown and quiet hours per event
+* (Alan Paris) Meteor showers, eclipses seen from home, moon and planet events, stargazing cloud forecast, and an "upcoming" page (www)
 
 ## License
 MIT License

@@ -86,5 +86,7 @@
     "Visualisation": "Wizualizacja",
     "With more cloud than this the aurora counts as not visible": "Przy większym zachmurzeniu zorza uznawana jest za niewidoczną",
     "aurora-nowcast instance for the Kp index": "Instancja aurora-nowcast dla indeksu Kp",
-    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "JSON readsb/tar1090: URL API z {lat}, {lon} oraz {radiusNm} lub {radiusKm} albo aircraft.json Twojego odbiornika. Sprawdź warunki używanej usługi."
+    "readsb/tar1090 JSON: an API URL with {lat}, {lon} and {radiusNm} or {radiusKm}, or your own receiver's aircraft.json. Check the terms of the service you use.": "JSON readsb/tar1090: URL API z {lat}, {lon} oraz {radiusNm} lub {radiusKm} albo aircraft.json Twojego odbiornika. Sprawdź warunki używanej usługi.",
+    "Stargazing forecast": "Prognoza do obserwacji nieba",
+    "Cloud cover for tonight from Open-Meteo (api.open-meteo.com), every 2 hours": "Zachmurzenie na dzisiejszą noc z Open-Meteo (api.open-meteo.com), co 2 godziny"
 }
