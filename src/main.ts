@@ -363,14 +363,15 @@ class Skyorama extends utils.Adapter {
         await this.write('info.connection', ok);
     }
 
+    /** Every message is handled (scripts may send without a callback); the answer goes back when there is one. */
     private onMessage(obj: ioBroker.Message): void {
-        if (!obj?.callback) {
+        if (!obj?.command) {
             return;
         }
         void this.answer(obj.command, obj.message)
             .catch((err: unknown) => ({ error: err instanceof Error ? err.message : String(err) }))
             .then(reply => {
-                if (!this.unloaded) {
+                if (obj.callback && !this.unloaded) {
                     this.sendTo(obj.from, obj.command, reply, obj.callback);
                 }
             });
@@ -397,6 +398,7 @@ class Skyorama extends utils.Adapter {
                     return { error: 'Notifications are not running (see the log)' };
                 }
                 const n = this.notifier.test();
+                this.log.info(`Test notification sent to ${n} instance${n === 1 ? '' : 's'}`);
                 return n
                     ? { result: `Test notification sent to ${n} instance${n === 1 ? '' : 's'}` }
                     : { error: 'No usable notification target is saved' };
