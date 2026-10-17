@@ -304,7 +304,8 @@
         P.status('');
         home = cfg.home;
         lightningOn = !!cfg.lightning;
-        map = L.map('map', { zoomSnap: 0.25, attributionControl: true });
+        // whole zoom steps with tiles: scaled tiles show hairline seams
+        map = L.map('map', { zoomSnap: cfg.tiles ? 1 : 0.25, attributionControl: true });
         if (cfg.tiles) {
             L.tileLayer(cfg.tiles, {
                 maxZoom: 17,
